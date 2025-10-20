@@ -2,7 +2,8 @@ import { Card, CardBody, CardHeader } from "../../components/Card";
 import TimeInput from "../../components/TimeInput";
 import DateInput from "../../components/DateInput";
 import SelectInput from "../../components/SelectInput";
-import React from "react";
+import React, { useMemo, useState } from "react";
+import CrewCar from "../../components/DepartureCard/CarCrewCard";
 
 const toISODate = (d) => {
   const y = d.getFullYear();
@@ -11,7 +12,57 @@ const toISODate = (d) => {
   return `${y}-${m}-${day}`;
 };
 
-export default function DepartureCard() {
+const emptyCrew = (n) => ({
+  driver: "",
+  commander: "",
+  firefighters: Array(n).fill(""),
+});
+
+const collectUsed = (crews) => {
+  const s = new Set();
+  for (const id in crews) {
+    const c = crews[id];
+    if (!c) continue;
+    if (c.driver) s.add(c.driver);
+    if (c.commander) s.add(c.commander);
+    (c.firefighters || []).forEach((f) => f && s.add(f));
+  }
+  return s;
+};
+
+export default function DepartureCard({
+  teamss = [], // jedna WSPÓLNA lista dla wszystkich pojazdów
+  vehicles = [
+    { id: "499z01", title: "499z01", firefightersCount: 4 },
+    { id: "499z02", title: "499z02", firefightersCount: 2 },
+    { id: "499z03", title: "499z03", firefightersCount: 6 },
+  ],
+}) {
+  // stan: id pojazdu -> jego obsada
+  const [crews, setCrews] = useState(() =>
+    Object.fromEntries(
+      vehicles.map((v) => [v.id, emptyCrew(v.firefightersCount)])
+    )
+  );
+
+  // wszyscy już użyci (we wszystkich wozach)
+  const usedAll = useMemo(() => collectUsed(crews), [crews]);
+
+  // exclude dla danej karty = wszyscy użyci poza jej własnymi wyborami
+  const excludeFor = (id) => {
+    const copy = new Set(usedAll);
+    const c = crews[id];
+    if (c) {
+      [c.driver, c.commander, ...(c.firefighters || [])]
+        .filter(Boolean)
+        .forEach((p) => copy.delete(p)); // nie wykluczaj własnych aktualnych wyborów
+    }
+    return [...copy];
+  };
+
+  const handleChange = (id, value) => {
+    setCrews((prev) => ({ ...prev, [id]: value }));
+  };
   const id = "reporter";
   const label = "Zgłaszający";
   const placeholder = "Wpisz nazwisko…";
@@ -24,6 +75,11 @@ export default function DepartureCard() {
   nextYear.setFullYear(today.getFullYear() + 1);
   const [date, setDate] = React.useState(toISODate(today));
   const [team, setTeam] = React.useState("");
+  const [crew, setCrew] = useState({
+    driver: "",
+    commander: "",
+    firefighters: Array(4).fill(""),
+  });
 
   const teams = [
     { value: "spojnia", label: "Barlinek" },
@@ -143,412 +199,17 @@ export default function DepartureCard() {
       <Card className="lg:col-span-3 lg:row-start-2">
         <CardBody className="p-4">
           <div className="grid sm:grid-cols-1 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardBody className="p-4">
-                <CardHeader title={"499z01"}></CardHeader>
-                <SelectInput
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Kierowca: "
-                  placeholder="— wybierz kierowce —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Dowódca: "
-                  placeholder="— wybierz powód —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-              </CardBody>
-            </Card>
-            <Card>
-              <CardBody className="p-4">
-                <CardHeader title={"499z01"}></CardHeader>
-                <SelectInput
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Kierowca: "
-                  placeholder="— wybierz kierowce —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Dowódca: "
-                  placeholder="— wybierz powód —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-              </CardBody>
-            </Card>
-            <Card>
-              <CardBody className="p-4">
-                <CardHeader title={"499z01"}></CardHeader>
-                <SelectInput
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Kierowca: "
-                  placeholder="— wybierz kierowce —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Dowódca: "
-                  placeholder="— wybierz powód —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-              </CardBody>
-            </Card>
-            <Card>
-              <CardBody className="p-4">
-                <CardHeader title={"499z01"}></CardHeader>
-                <SelectInput
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Kierowca: "
-                  placeholder="— wybierz kierowce —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Dowódca: "
-                  placeholder="— wybierz powód —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-              </CardBody>
-            </Card>
-            <Card>
-              <CardBody className="p-4">
-                <CardHeader title={"499z01"}></CardHeader>
-                <SelectInput
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Kierowca: "
-                  placeholder="— wybierz kierowce —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Dowódca: "
-                  placeholder="— wybierz powód —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-              </CardBody>
-            </Card>
-            <Card>
-              <CardBody className="p-4">
-                <CardHeader title={"499z01"}></CardHeader>
-                <SelectInput
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Kierowca: "
-                  placeholder="— wybierz kierowce —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Dowódca: "
-                  placeholder="— wybierz powód —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-              </CardBody>
-            </Card>
-            <Card>
-              <CardBody className="p-4">
-                <CardHeader title={"499z01"}></CardHeader>
-                <SelectInput
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Kierowca: "
-                  placeholder="— wybierz kierowce —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Dowódca: "
-                  placeholder="— wybierz powód —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-                <SelectInput
-                  className="mt-5"
-                  value={team}
-                  onChange={setTeam}
-                  options={teams}
-                  label="Strażak: "
-                  placeholder="— wybierz strażaka —"
-                  required
-                />
-              </CardBody>
-            </Card>
+            {vehicles.map((v) => (
+              <CrewCar
+                key={v.id}
+                title={v.title}
+                teams={teams} // ta sama lista dla wszystkich
+                value={crews[v.id]}
+                onChange={(val) => handleChange(v.id, val)}
+                firefightersCount={v.firefightersCount}
+                exclude={excludeFor(v.id)} // ⬅️ globalne wykluczenia
+              />
+            ))}
           </div>
         </CardBody>
       </Card>
