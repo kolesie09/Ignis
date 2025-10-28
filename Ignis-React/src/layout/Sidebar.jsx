@@ -1,7 +1,13 @@
 import React from "react";
 import SidebarItem from "../components/SidebarItem";
 // (opcjonalnie ikony)
-import { Home, FileText, ShoppingBag, Mail } from "lucide-react";
+import {
+  Home,
+  FileText,
+  ShoppingBag,
+  Mail,
+  ChartNoAxesCombined,
+} from "lucide-react";
 
 export default function Sidebar({ open, onOpenChange }) {
   // Zamknij ESC
@@ -54,6 +60,17 @@ export default function Sidebar({ open, onOpenChange }) {
               icon={FileText}
               subItems={[
                 { label: "Karta wyjazdu", to: "/documents/departurecard" },
+                { label: "Karta szkoleń", to: "#billing" },
+                { label: "Karta ćwiczeń", to: "#invoice" },
+                { label: "Karta kierowcy", to: "#invoice" },
+              ]}
+              onNavigate={() => onOpenChange(false)}
+            />
+            <SidebarItem
+              label="Statystyki"
+              icon={ChartNoAxesCombined}
+              subItems={[
+                { label: "Strażackie", to: "/statistics/firefighter" },
                 { label: "Karta szkoleń", to: "#billing" },
                 { label: "Karta ćwiczeń", to: "#invoice" },
                 { label: "Karta kierowcy", to: "#invoice" },

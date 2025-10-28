@@ -28,7 +28,7 @@ export default function AppLayout() {
           >
             ☰
           </button>
-          <h1 className="text-2xl font-bold dark:text-gray-100">Dashboard</h1>
+          <h1 className="text-2xl font-bold dark:text-gray-100">IGNIS</h1>
           <div className="bg-gray-300 w-10 h-10 rounded-full"></div>
         </header>
 
