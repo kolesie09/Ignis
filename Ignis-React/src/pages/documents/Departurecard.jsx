@@ -31,7 +31,6 @@ const collectUsed = (crews) => {
 };
 
 export default function DepartureCard({
-  teamss = [], // jedna WSPÓLNA lista dla wszystkich pojazdów
   vehicles = [
     { id: "499z01", title: "499z01", firefightersCount: 4 },
     { id: "499z02", title: "499z02", firefightersCount: 2 },
@@ -64,27 +63,63 @@ export default function DepartureCard({
     setCrews((prev) => ({ ...prev, [id]: value }));
   };
   const id = "reporter";
-  const label = "Zgłaszający";
-  const placeholder = "Wpisz nazwisko…";
+  const _label = "Zgłaszający";
+  const _placeholder = "Wpisz nazwisko…";
   const [value, setValue] = React.useState("");
-  const options = ["Kowalski", "Nowak", "Wiśniewski"];
+  const reporters = [
+    "Kowalski",
+    "Nowak",
+    "Wiśniewski",
+    "Zieliński",
+    "Lewandowski",
+  ];
   const [timeDeparture, setTimeDeparture] = React.useState("18:30");
   const [timeArrival, setTimeArrival] = React.useState("18:30");
   const today = new Date();
   const nextYear = new Date(today);
   nextYear.setFullYear(today.getFullYear() + 1);
   const [date, setDate] = React.useState(toISODate(today));
-  const [team, setTeam] = React.useState("");
-  const [crew, setCrew] = useState({
+  // oddzielne stany dla pól, żeby nie używać tej samej zmiennej wszędzie
+  const [location, setLocation] = React.useState("");
+  const [street, setStreet] = React.useState("");
+  const [distance, setDistance] = React.useState("");
+  const [category, setCategory] = React.useState("");
+  const [reason, setReason] = React.useState("");
+  const [_crew, _setCrew] = useState({
     driver: "",
     commander: "",
     firefighters: Array(4).fill(""),
   });
 
-  const teams = [
-    { value: "spojnia", label: "Barlinek" },
-    { value: "astoria", label: "Rychnów" },
-    { value: "polonia", label: "Mostkowo", disabled: true }, // przykład disabled
+  const locations = [
+    { value: "barlinek", label: "Barlinek" },
+    { value: "rychnow", label: "Rychnów" },
+    { value: "mostkowo", label: "Mostkowo" },
+    { value: "gorzow", label: "Gorzów Wielkopolski" },
+  ];
+
+  const streets = [
+    { value: "main", label: "ul. Główna" },
+    { value: "3maja", label: "ul. 3 Maja" },
+    { value: "krakowska", label: "ul. Krakowska" },
+  ];
+
+  const distances = [
+    { value: "5", label: "5 km" },
+    { value: "10", label: "10 km" },
+    { value: "20", label: "20 km" },
+  ];
+
+  const categories = [
+    { value: "traffic", label: "Wypadek drogowy" },
+    { value: "fire", label: "Pożar" },
+    { value: "medical", label: "Pomoc medyczna" },
+  ];
+
+  const reasons = [
+    { value: "alarm", label: "Alarm" },
+    { value: "false_alarm", label: "Fałszywy alarm" },
+    { value: "assistance", label: "Pomoc innym służbom" },
   ];
 
   return (
@@ -107,7 +142,7 @@ export default function DepartureCard({
             />
 
             <datalist id={`${id}-list`}>
-              {options.map((opt) => (
+              {reporters.map((opt) => (
                 <option key={opt} value={opt} />
               ))}
             </datalist>
@@ -148,29 +183,29 @@ export default function DepartureCard({
       <Card>
         <CardBody className="p-4">
           <SelectInput
-            value={team}
-            onChange={setTeam}
-            options={teams}
+            value={location}
+            onChange={setLocation}
+            options={locations}
             label="Miejscowość: "
             placeholder="— wybierz miejscowość —"
             required
           />
           <SelectInput
             className="mt-5"
-            value={team}
-            onChange={setTeam}
-            options={teams}
+            value={street}
+            onChange={setStreet}
+            options={streets}
             label="Ulica: "
-            placeholder="— wybierz ulice —"
+            placeholder="— wybierz ulicę —"
             required
           />
           <SelectInput
             className="mt-5"
-            value={team}
-            onChange={setTeam}
-            options={teams}
+            value={distance}
+            onChange={setDistance}
+            options={distances}
             label="Liczba kilometrów: "
-            placeholder="— wybierz liczbe kilometrów —"
+            placeholder="— wybierz liczbę kilometrów —"
             required
           />
         </CardBody>
@@ -178,18 +213,18 @@ export default function DepartureCard({
       <Card>
         <CardBody className="p-4">
           <SelectInput
-            value={team}
-            onChange={setTeam}
-            options={teams}
+            value={category}
+            onChange={setCategory}
+            options={categories}
             label="Kategoria: "
-            placeholder="— wybierz kategorie —"
+            placeholder="— wybierz kategorię —"
             required
           />
           <SelectInput
             className="mt-5"
-            value={team}
-            onChange={setTeam}
-            options={teams}
+            value={reason}
+            onChange={setReason}
+            options={reasons}
             label="Powód: "
             placeholder="— wybierz powód —"
             required
@@ -203,7 +238,7 @@ export default function DepartureCard({
               <CrewCar
                 key={v.id}
                 title={v.title}
-                teams={teams} // ta sama lista dla wszystkich
+                teams={reporters} // ta sama lista dla wszystkich
                 value={crews[v.id]}
                 onChange={(val) => handleChange(v.id, val)}
                 firefightersCount={v.firefightersCount}

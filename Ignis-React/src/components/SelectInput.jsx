@@ -41,9 +41,8 @@ export default function SelectInput({
           aria-describedby={error ? errorId : undefined}
         >
           {placeholder && (
-            <option value="" disabled>
-              {placeholder}
-            </option>
+            // placeholder should be selectable so the user can clear the selection
+            <option value="">{placeholder}</option>
           )}
           {options.map((opt) => (
             <option key={opt.value} value={opt.value} disabled={opt.disabled}>

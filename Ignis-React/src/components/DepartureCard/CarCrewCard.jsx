@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Card, CardBody, CardHeader } from "../Card";
 import SelectInput from "../../components/SelectInput";
+import { Button } from "../../components/Button.jsx";
 
 export default function CrewCar({
   title = "499z01",
@@ -117,6 +118,14 @@ export default function CrewCar({
     <Card className={className}>
       <CardBody className="p-4">
         <CardHeader title={title} />
+
+        {enableAutoAssign && (
+          <div className="mb-3">
+            <Button variant="ghost" onClick={autoAssign}>
+              Auto-obsadź
+            </Button>
+          </div>
+        )}
 
         <SelectInput
           value={driver}

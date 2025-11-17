@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import Sidebar from "./Sidebar.jsx";
 import { router } from "./Routing.jsx";
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, _setDarkMode] = useState(false);
 
   return (
     <div

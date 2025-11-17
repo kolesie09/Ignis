@@ -1,13 +1,13 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import AppLayout from "./layout/AppLayout.jsx";
+import AppLayout from "./AppLayout.jsx";
 
 // Strony
-import Dashboard from "./pages/Dashboard.jsx";
-import Projects from "./pages/Projects.jsx";
-import Calendar from "./pages/Calendar.jsx";
-import Reports from "./pages/Reports.jsx";
+import Dashboard from "../pages/Dashboard.jsx";
+import Projects from "../pages/Projects.jsx";
+import Calendar from "../pages/Calendar.jsx";
+import Reports from "../pages/Reports.jsx";
 
 const router = createBrowserRouter([
   {

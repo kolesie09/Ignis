@@ -4,7 +4,6 @@ import { Button } from "../components/Button.jsx";
 export default function Header({
   theme,
   setTheme,
-  openSidebar,
   setOpenSidebar,
   rightOffset = false,
 }) {

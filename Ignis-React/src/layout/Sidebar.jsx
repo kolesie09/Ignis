@@ -7,6 +7,7 @@ import {
   ShoppingBag,
   Mail,
   ChartNoAxesCombined,
+  Archive,
 } from "lucide-react";
 
 export default function Sidebar({ open, onOpenChange }) {
@@ -79,9 +80,15 @@ export default function Sidebar({ open, onOpenChange }) {
             />
 
             <SidebarItem
-              label="Overview"
-              icon={Home}
+              label="Administacja"
+              icon={Archive}
               to={"/home"}
+              subItems={[
+                { label: "Dane osobowe", to: "/administration/myaccount" },
+                { label: "Karta szkoleń", to: "#billing" },
+                { label: "Karta ćwiczeń", to: "#invoice" },
+                { label: "Karta kierowcy", to: "#invoice" },
+              ]}
               onNavigate={() => onOpenChange(false)}
             />
 

@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 export const Input = ({ className = "", ...props }) => (
   <input
     className={`w-full rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/60 ${className}`}

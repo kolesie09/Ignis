@@ -38,6 +38,7 @@ export default function Firefighter() {
                 <th>Nazwa</th>
                 <th>Liczba wyjazdów</th>
                 <th>Poświęcony czas</th>
+                <th>Procent</th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800">
@@ -47,6 +48,7 @@ export default function Firefighter() {
                   who={n.who}
                   departure={n.departure}
                   hour={n.hour}
+                  percent={n.percent}
                 />
               ))}
             </tbody>
