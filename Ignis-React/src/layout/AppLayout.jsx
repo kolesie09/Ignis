@@ -4,7 +4,7 @@ import { router } from "./Routing.jsx";
 
 import { RouterProvider } from "react-router-dom";
 
-export default function AppLayout() {
+export default function AppLayout({ handleLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, _setDarkMode] = useState(false);
 
@@ -29,7 +29,10 @@ export default function AppLayout() {
             ☰
           </button>
           <h1 className="text-2xl font-bold dark:text-gray-100">IGNIS</h1>
-          <div className="bg-gray-300 w-10 h-10 rounded-full"></div>
+          <div
+            onClick={handleLogout}
+            className="bg-gray-300 w-10 h-10 rounded-full"
+          ></div>
         </header>
 
         {/* TU SIĘ ZMIENIA TYLKO ZAWARTOŚĆ STRONY */}

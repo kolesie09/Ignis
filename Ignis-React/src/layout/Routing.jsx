@@ -5,6 +5,7 @@ import DepartureCard from "../pages/documents/Departurecard.jsx";
 import Firefighter from "../pages/statistics/Firefighter.jsx";
 import MyAccount from "../pages/administration/MyAccount.jsx";
 import Login from "../pages/auth/Login.jsx";
+import Register from "../pages/auth/Register.jsx";
 
 export const router = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -15,4 +16,5 @@ export const router = createBrowserRouter([
   { path: "/administration/myaccount", element: <MyAccount /> },
   { path: "/my-account", element: <MyAccount /> },
   { path: "/login", element: <Login /> },
+  { path: "/register", element: <Register /> },
 ]);

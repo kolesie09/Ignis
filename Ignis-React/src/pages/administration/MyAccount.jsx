@@ -26,7 +26,6 @@ export default function MyAccount() {
     const err = {};
     if (!form.firstName?.trim()) err.firstName = "Imię jest wymagane";
     if (!form.email?.trim()) err.email = "Email jest wymagany";
-    // prosty regex email (nie idealny, ale wystarczy do demo)
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       err.email = "Nieprawidłowy format email";
     return err;
@@ -37,7 +36,6 @@ export default function MyAccount() {
     const v = validate();
     setErrors(v);
     if (Object.keys(v).length === 0) {
-      // Mock submit — w realnej aplikacji wyślij do API
       console.log("Submitting MyAccount:", form);
       alert("Dane zapisane (zobacz konsolę)");
     }
