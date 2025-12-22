@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from "react";
 import { Card, CardBody, CardHeader } from "../Card";
 import SelectInput from "../../components/SelectInput";
 import { Button } from "../../components/Button.jsx";
@@ -22,6 +28,8 @@ export default function CrewCar({
     const base = value?.firefighters ?? [];
     return Array.from({ length: firefightersCount }, (_, i) => base[i] ?? "");
   });
+
+  const prevValueRef = useRef();
 
   // ——— Normalizacja opcji i zbiory pomocnicze ———
   const asOption = (o) => (typeof o === "string" ? { label: o, value: o } : o);
@@ -56,23 +64,29 @@ export default function CrewCar({
         (_, i) => value.firefighters?.[i] ?? ""
       )
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(value), firefightersCount]);
+  }, [value]); // Użyj value jako zależności
 
   // 🔧 NOWE: gdy NIE używasz `value` (tryb niekontrolowany), zmiana firefightersCount przeskaluje tablicę
   useEffect(() => {
-    if (value) return; // w trybie kontrolowanym robi to efekt powyżej
+    if (value) return; // W trybie kontrolowanym robi to efekt powyżej
     setFirefighters((prev) => {
+      if (prev.length === firefightersCount) return prev; // Unikaj aktualizacji, jeśli długość jest taka sama
       const next = prev.slice(0, firefightersCount);
       while (next.length < firefightersCount) next.push("");
       return next;
     });
-  }, [firefightersCount, value]);
+  }, [firefightersCount]); // Usuń value z zależności
 
   // Propagacja do rodzica
   useEffect(() => {
-    onChange?.({ driver, commander, firefighters });
-  }, [driver, commander, firefighters, onChange]);
+    const current = { driver, commander, firefighters };
+    if (JSON.stringify(current) !== JSON.stringify(prevValueRef.current)) {
+      prevValueRef.current = current;
+      if (onChange) {
+        onChange(current);
+      }
+    }
+  }, [driver, commander, firefighters]); // Usuń onChange z zależności
 
   const updateFirefighter = (idx, v) => {
     setFirefighters((prev) => {
@@ -113,6 +127,10 @@ export default function CrewCar({
       return sized.map((f) => takeNext(f));
     });
   };
+
+  const handleChange = useCallback((newValue) => {
+    // logika obsługi zmiany
+  }, []);
 
   return (
     <Card className={className}>

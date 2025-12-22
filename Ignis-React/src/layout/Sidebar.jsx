@@ -52,7 +52,7 @@ export default function Sidebar({ open, onOpenChange }) {
             <SidebarItem
               label="Dashboard"
               icon={Home}
-              to={"/home"}
+              to={"/"}
               onNavigate={() => onOpenChange(false)}
             />
 
@@ -60,7 +60,7 @@ export default function Sidebar({ open, onOpenChange }) {
               label="Dokumentacja"
               icon={FileText}
               subItems={[
-                { label: "Karta wyjazdu", to: "/documents/departurecard" },
+                { label: "Karta wyjazdu", to: "/departurecard" }, // Zmieniono z "/documents/departurecard"
                 { label: "Karta szkoleń", to: "#billing" },
                 { label: "Karta ćwiczeń", to: "#invoice" },
                 { label: "Karta kierowcy", to: "#invoice" },
@@ -71,7 +71,7 @@ export default function Sidebar({ open, onOpenChange }) {
               label="Statystyki"
               icon={ChartNoAxesCombined}
               subItems={[
-                { label: "Strażackie", to: "/statistics/firefighter" },
+                { label: "Strażackie", to: "/statistics/firefighter" }, // Zmieniono z "/statistics/firefighter"
                 { label: "Karta szkoleń", to: "#billing" },
                 { label: "Karta ćwiczeń", to: "#invoice" },
                 { label: "Karta kierowcy", to: "#invoice" },
@@ -82,9 +82,9 @@ export default function Sidebar({ open, onOpenChange }) {
             <SidebarItem
               label="Administacja"
               icon={Archive}
-              to={"/home"}
+              to={"/"} // Zmieniono z "/home" – jeśli ma prowadzić do głównej prywatnej strony
               subItems={[
-                { label: "Dane osobowe", to: "/administration/myaccount" },
+                { label: "Dane osobowe", to: "/myaccount" }, // Zmieniono z "/administration/myaccount"
                 { label: "Karta szkoleń", to: "#billing" },
                 { label: "Karta ćwiczeń", to: "#invoice" },
                 { label: "Karta kierowcy", to: "#invoice" },

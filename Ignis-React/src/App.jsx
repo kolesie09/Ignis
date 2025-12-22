@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import AppLayout from "./layout/AppLayout.jsx";
 import Login from "./pages/auth/Login.jsx";
 import Register from "./pages/auth/Register.jsx";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./layout/Routing.jsx";
 
 function App() {
   const [authenticated, setAuthenticated] = useState(
@@ -45,7 +47,7 @@ function App() {
       );
     }
   } else {
-    return <AppLayout handleLogout={handleLogout} />;
+    return <RouterProvider router={router} />;
   }
 }
 

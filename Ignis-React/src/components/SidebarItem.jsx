@@ -12,6 +12,7 @@ function LinkMaybe({ to, href, className, onClick, children, end }) {
       </NavLink>
     );
   }
+
   return (
     <a
       href={href ?? (typeof to === "string" ? to : "#")}
@@ -60,6 +61,7 @@ export default function SidebarItem({
     "flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white";
 
   const handleLeafClick = (e, item) => {
+    console.log("Navigating to:", item.to); // Dodaj log
     item?.onClick?.(e);
     onNavigate?.(item);
   };
