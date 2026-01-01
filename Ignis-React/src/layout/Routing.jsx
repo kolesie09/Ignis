@@ -7,6 +7,7 @@ import MyAccount from "../pages/administration/MyAccount.jsx";
 import Login from "../pages/auth/Login.jsx";
 import Register from "../pages/auth/Register.jsx";
 import Home from "../pages/Home.jsx";
+import History from "../pages/documents/History.jsx";
 
 export const router = createBrowserRouter([
   // Strony publiczne
@@ -26,8 +27,12 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "departurecard",
+        path: "documents/departurecard",
         element: <DepartureCard />,
+      },
+      {
+        path: "documents/history",
+        element: <History />,
       },
       {
         path: "statistics",

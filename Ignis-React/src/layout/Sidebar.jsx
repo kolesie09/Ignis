@@ -43,11 +43,11 @@ export default function Sidebar({ open, onOpenChange }) {
       <aside
         id="sidebar"
         aria-label="Sidenav"
-        className={`fixed top-0 left-0 z-40 w-64 h-screen transition-transform duration-300
+        className={`fixed top-0 left-0 z-40 w-64 h-screen  transition-transform duration-300
           ${open ? "translate-x-0" : "-translate-x-full"}
           sm:translate-x-0 md:static `}
       >
-        <div className="overflow-y-auto py-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <div className="overflow-y-auto py-5 px-3 h-full  bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <ul className="space-y-2">
             <SidebarItem
               label="Dashboard"
@@ -60,10 +60,11 @@ export default function Sidebar({ open, onOpenChange }) {
               label="Dokumentacja"
               icon={FileText}
               subItems={[
-                { label: "Karta wyjazdu", to: "/departurecard" }, // Zmieniono z "/documents/departurecard"
+                { label: "Karta wyjazdu", to: "/documents/departurecard" }, // Zmieniono z "/documents/departurecard"
                 { label: "Karta szkoleń", to: "#billing" },
                 { label: "Karta ćwiczeń", to: "#invoice" },
                 { label: "Karta kierowcy", to: "#invoice" },
+                { label: "Historia", to: "/documents/history" },
               ]}
               onNavigate={() => onOpenChange(false)}
             />
