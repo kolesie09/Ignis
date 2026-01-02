@@ -10,7 +10,7 @@ export default function AppLayout({ handleLogout }) {
 
   return (
     <div
-      className={`flex bg-gray-100 h-screen ${
+      className={`flex bg-gray-100  w-full h-screen ${
         darkMode ? "dark" : ""
       } dark:bg-gray-900`}
     >
@@ -18,14 +18,14 @@ export default function AppLayout({ handleLogout }) {
       <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
 
       {/* main content */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col w-screen">
         {/* HEADER (stały) */}
         <Header
           handleLogout={handleLogout}
           onMenuClick={() => setSidebarOpen(true)}
         />
 
-        <div className="p-4 flex-1 overflow-auto">
+        <div className="p-1 md:p-4 flex-1 overflow-auto ">
           {/* 2. TU WSTAWIAMY OUTLET - tutaj wpadną Twoje podstrony */}
           <Outlet />
         </div>

@@ -3,7 +3,7 @@ import React from "react";
 import { NavLink, useInRouterContext } from "react-router-dom";
 
 // Link, który działa z/bez routera
-function LinkMaybe({ to, href, className, onClick, children, end }) {
+export function LinkMaybe({ to, href, className, onClick, children, end }) {
   const inRouter = useInRouterContext();
   if (inRouter && to != null) {
     return (

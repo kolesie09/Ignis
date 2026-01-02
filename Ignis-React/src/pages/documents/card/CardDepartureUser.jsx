@@ -1,14 +1,19 @@
 import React, { useState, useMemo } from "react";
-import { Card, CardBody } from "../../components/Card";
+import { Card, CardBody } from "../../../components/Card";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
-import { rows } from "../../data/mock.js";
+import { rows } from "../../../data/mock.js";
 import { MoreVertical } from "lucide-react";
-import { AvatarStack } from "../../components/Avatar.jsx";
-import { useNavigate } from "react-router-dom";
+import { AvatarStack } from "../../../components/Avatar.jsx";
+import { useNavigate, useParams } from "react-router-dom";
 
-export default function History() {
+export default function CardDepartureUser() {
   const [openRight, setOpenRight] = useState(false);
   const [selected, setSelected] = useState(null);
+  const { user } = useParams();
+  const znalezionyElement = rows.filter((r) =>
+    r.members.includes(user.replaceAll("-", " "))
+  );
+
   const navigate = useNavigate();
 
   return (
@@ -29,7 +34,7 @@ export default function History() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r, idx) => (
+              {znalezionyElement.map((r, idx) => (
                 <tr
                   key={r.id}
                   className={`border-t border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/40 ${

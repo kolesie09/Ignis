@@ -11,7 +11,7 @@ export default function Header({ handleLogout, onMenuClick }) {
       >
         ☰
       </button>
-      <h1 className="text-2xl font-bold dark:text-gray-100">IGNIS!</h1>
+      <h1 className="text-2xl font-bold dark:text-gray-100">IGNIS</h1>
       <div
         onClick={handleLogout}
         className="bg-gray-300 w-10 h-10 rounded-full"

@@ -7,7 +7,7 @@ export const quick = [
 
 export const rows = [
   {
-    id: "23/2025",
+    id: "23-2025",
     name: "Karta 23/2025 – Pożar traw",
     location: "Barlinek, ul. Długa",
     type: "Pożar",
@@ -23,7 +23,7 @@ export const rows = [
     ],
   },
   {
-    id: "24/2025",
+    id: "24-2025",
     name: "Karta 24/2025 – MZ: powalone drzewo",
     location: "Mostkowo",
     type: "MZ",
@@ -33,7 +33,7 @@ export const rows = [
     members: ["Jan Kowalski", "Anna Nowak"],
   },
   {
-    id: "25/2025",
+    id: "25-2025",
     name: "Karta 25/2025 – Alarm fałszywy",
     location: "Rychnów",
     type: "Alarm",

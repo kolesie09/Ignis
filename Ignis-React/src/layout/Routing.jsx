@@ -9,6 +9,9 @@ import Register from "../pages/auth/Register.jsx";
 import Home from "../pages/Home.jsx";
 import History from "../pages/documents/History.jsx";
 
+import CardDeparture from "../pages/documents/card/CardDeparture.jsx";
+import CardDepartureUser from "../pages/documents/card/CardDepartureUser.jsx";
+
 export const router = createBrowserRouter([
   // Strony publiczne
   { path: "/login", element: <Login /> },
@@ -27,12 +30,26 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "documents/departurecard",
-        element: <DepartureCard />,
+        path: "documents/history/card/:id",
+        element: <CardDeparture />,
       },
       {
-        path: "documents/history",
-        element: <History />,
+        path: "documents/history/:user",
+        element: <CardDepartureUser />,
+      },
+      {
+        path: "documents",
+
+        children: [
+          {
+            path: "departurecard",
+            element: <DepartureCard />,
+          },
+          {
+            path: "history",
+            element: <History />,
+          },
+        ],
       },
       {
         path: "statistics",
