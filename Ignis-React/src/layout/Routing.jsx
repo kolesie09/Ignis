@@ -11,6 +11,7 @@ import History from "../pages/documents/History.jsx";
 
 import CardDeparture from "../pages/documents/card/CardDeparture.jsx";
 import CardDepartureUser from "../pages/documents/card/CardDepartureUser.jsx";
+import { RequireAuth } from "../context/RequireAuth.jsx";
 
 export const router = createBrowserRouter([
   // Strony publiczne
@@ -19,7 +20,11 @@ export const router = createBrowserRouter([
   // Strony prywatne z AppLayout
   {
     path: "/",
-    element: <AppLayout handleLogout={() => console.log("Logout")} />,
+    element: (
+      <RequireAuth>
+        <AppLayout />
+      </RequireAuth>
+    ),
     children: [
       {
         index: true,

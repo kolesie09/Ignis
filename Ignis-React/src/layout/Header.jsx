@@ -1,5 +1,7 @@
 import { Menu, Search, Bell, Sun, Moon } from "lucide-react";
 import { Button } from "../components/Button.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Header({ handleLogout, onMenuClick }) {
   return (

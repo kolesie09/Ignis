@@ -1,12 +1,20 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar.jsx";
 import Header from "./Header.jsx";
-
-import { Outlet } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
+import { Outlet, useNavigate } from "react-router-dom";
 
 export default function AppLayout({ handleLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, _setDarkMode] = useState(false);
+
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogoutClick = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <div
@@ -21,7 +29,7 @@ export default function AppLayout({ handleLogout }) {
       <main className="flex-1 flex flex-col w-screen">
         {/* HEADER (stały) */}
         <Header
-          handleLogout={handleLogout}
+          handleLogout={handleLogoutClick}
           onMenuClick={() => setSidebarOpen(true)}
         />
 

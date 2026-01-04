@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import App from "../../App";
+import { useNavigate } from "react-router-dom";
 
 function Register({ handleSwitchToLogin }) {
   const [imie, setImie] = useState("");
   const [nazwisko, setNazwisko] = useState("");
   const [email, setEmail] = useState("");
+  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [imieError, setImieError] = useState(false);
   const [nazwiskoError, setNazwiskoError] = useState(false);
   const [emailError, setEmailError] = useState(false);
@@ -159,7 +160,7 @@ function Register({ handleSwitchToLogin }) {
           className="hover:bg-blue-600 bg-blue-500 text-white w-full p-4 mt-4 rounded-md"
           type="button"
           onClick={() => {
-            handleSwitchToLogin();
+            navigate("/login");
           }}
         >
           Mam już konto

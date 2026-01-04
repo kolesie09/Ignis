@@ -1,24 +1,27 @@
 import React, { useState } from "react";
 import App from "../../App";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 const users = [{ login: "admin", password: "admin" }];
 
-function Login({ setAuthenticated, setRegistered, handleRegister }) {
-  const [login, setLogin] = useState("");
+function Login({ setRegistered, handleRegister }) {
+  const [loginn, setLoginn] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault(); // Zapobiega przeładowaniu strony przy submit
 
     const foundUser = users.find(
-      (user) => user.login === login && user.password === password
+      (user) => user.login === loginn && user.password === password
     ); //Wklejone w handleSubmit ponieważ będzie się wtedy tylko raz wykonywać
 
     if (foundUser) {
-      setAuthenticated(true);
-
-      localStorage.setItem("authenticated", "true");
+      login();
+      navigate("/");
     } else {
       setError("Błędny login lub hasło");
     }
@@ -39,8 +42,8 @@ function Login({ setAuthenticated, setRegistered, handleRegister }) {
               className="border border-gray-300 w-full p-2 rounded-md mt-4 "
               type="text"
               placeholder="Login"
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
+              value={loginn}
+              onChange={(e) => setLoginn(e.target.value)}
             />
           </div>
           <div>
@@ -63,7 +66,7 @@ function Login({ setAuthenticated, setRegistered, handleRegister }) {
         <button
           className="hover:bg-blue-600 bg-blue-500 text-white w-full p-4 mt-4 rounded-md"
           type="button"
-          onClick={(() => setRegistered(false), handleRegister)}
+          onClick={() => navigate("/register")}
         >
           Zarejestruj się
         </button>
