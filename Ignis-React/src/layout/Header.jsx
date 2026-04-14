@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function Header({ handleLogout, onMenuClick }) {
   return (
-    <header className="bg-white flex justify-between p-4 dark:bg-gray-900">
+    <header className="bg-white flex justify-between p-4 dark:bg-gray-800">
       <button
         className="p-2 text-xl font-bold lg:hidden dark:text-gray-100"
         onClick={onMenuClick}
@@ -13,10 +13,9 @@ export default function Header({ handleLogout, onMenuClick }) {
       >
         ☰
       </button>
-      <h1 className="text-2xl font-bold dark:text-gray-100">IGNIS</h1>
       <div
         onClick={handleLogout}
-        className="bg-gray-300 w-10 h-10 rounded-full"
+        className="bg-gray-300 w-10 h-8  rounded-full"
       ></div>
     </header>
   );

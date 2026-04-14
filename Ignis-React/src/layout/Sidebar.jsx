@@ -48,6 +48,9 @@ export default function Sidebar({ open, onOpenChange }) {
           sm:translate-x-0 md:static `}
       >
         <div className="overflow-y-auto py-5 px-3 h-full  bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <h1 className="text-2xl font-bold text-center mb-5 dark:text-gray-100">
+            IGNIS
+          </h1>
           <ul className="space-y-2">
             <SidebarItem
               label="Dashboard"

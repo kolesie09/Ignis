@@ -7,6 +7,7 @@ function Register({ handleSwitchToLogin }) {
   const [nazwisko, setNazwisko] = useState("");
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
+  const [darkMode, _setDarkMode] = useState(true);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [imieError, setImieError] = useState(false);
@@ -52,7 +53,9 @@ function Register({ handleSwitchToLogin }) {
   };
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+    <div
+      className={`flex h-screen w-full items-center justify-center bg-gray-100 text-gray-900 ${darkMode ? "dark" : ""} dark:bg-gray-900 dark:text-gray-100`}
+    >
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800">
         <img
           className="mx-auto mb-4 h-32 w-32 rounded-md"

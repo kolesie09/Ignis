@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
 import AppLayout from "./AppLayout";
-import Dashboard from "../pages/Dashboard.jsx";
 import DepartureCard from "../pages/documents/Departurecard.jsx";
 import Firefighter from "../pages/statistics/Firefighter.jsx";
 import MyAccount from "../pages/administration/MyAccount.jsx";

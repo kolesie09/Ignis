@@ -6,7 +6,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 
 export default function AppLayout({ handleLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, _setDarkMode] = useState(false);
+  const [darkMode, _setDarkMode] = useState(true);
 
   const { logout } = useAuth();
   const navigate = useNavigate();

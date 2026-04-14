@@ -10,25 +10,39 @@ function Login({ setRegistered, handleRegister }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useAuth();
+  const [darkMode, _setDarkMode] = useState(true);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); // Zapobiega przeładowaniu strony przy submit
 
-    const foundUser = users.find(
-      (user) => user.login === loginn && user.password === password
-    ); //Wklejone w handleSubmit ponieważ będzie się wtedy tylko raz wykonywać
-
-    if (foundUser) {
-      login();
-      navigate("/");
-    } else {
-      setError("Błędny login lub hasło");
+    try {
+      const response = await fetch("http://localhost:8080/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ login: loginn, password }),
+      });
+      // To jest obecny kod, który ma błąd logiczny:
+      if (response.ok) {
+        // "Jeśli odpowiedź NIE jest poprawna..."
+        login();
+        navigate("/");
+      } else {
+        // "...w przeciwnym razie (czyli gdy jest OK) pokaż błąd"
+        setError("Błędny login lub hasło");
+      }
+    } catch (error) {
+      console.error("Błąd podczas logowania:", error);
+      setError("Wystąpił błąd podczas logowania. Spróbuj ponownie.");
     }
   };
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+    <div
+      className={`flex h-screen w-full items-center justify-center bg-gray-100 text-gray-900 ${darkMode ? "dark" : ""} dark:bg-gray-900 dark:text-gray-100`}
+    >
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800">
         <img
           className="mx-auto mb-4 h-32 w-32 rounded-md"
