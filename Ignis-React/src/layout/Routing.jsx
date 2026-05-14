@@ -14,8 +14,14 @@ import { RequireAuth } from "../context/RequireAuth.jsx";
 
 export const router = createBrowserRouter([
   // Strony publiczne
-  { path: "/login", element: <Login /> },
-  { path: "/register", element: <Register /> },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
   // Strony prywatne z AppLayout
   {
     path: "/",
@@ -43,7 +49,6 @@ export const router = createBrowserRouter([
       },
       {
         path: "documents",
-
         children: [
           {
             path: "departurecard",
@@ -57,7 +62,6 @@ export const router = createBrowserRouter([
       },
       {
         path: "statistics",
-        element: <Firefighter />,
         children: [
           {
             path: "firefighter",
@@ -69,7 +73,6 @@ export const router = createBrowserRouter([
         path: "myaccount",
         element: <MyAccount />,
       },
-      // Dodaj inne prywatne strony w podobny sposób
     ],
   },
 ]);

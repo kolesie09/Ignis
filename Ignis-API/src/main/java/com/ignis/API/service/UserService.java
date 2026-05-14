@@ -1,21 +1,26 @@
 package com.ignis.API.service;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.util.List;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.ignis.API.entity.Role;
 import com.ignis.API.entity.User;
 import com.ignis.API.repository.UserRepository;
-
-import org.springframework.stereotype.Service;
+import com.ignis.API.security.JwtService;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     // Spring automatycznie "wstrzyknie" tutaj nasze repozytorium
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, JwtService jwtService) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
@@ -42,8 +47,17 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Użytkownik nie znaleziony!"));
     }
 
-    public boolean login(String login, String password) {
+    public String login(String login, String password) {
         User user = getUserByLogin(login);
-        return passwordEncoder.matches(password, user.getPassword());
+        List<String> roles = user.getRoles()
+                .stream()
+                .map(Role::getName)
+                .toList();
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            return null;
+        }
+
+        return jwtService.generateToken(user.getLogin(), roles);
     }
 }

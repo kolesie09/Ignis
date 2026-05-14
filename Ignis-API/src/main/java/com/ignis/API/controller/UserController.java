@@ -2,12 +2,18 @@ package com.ignis.API.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.ignis.API.dto.LoginRequest;
+import com.ignis.API.dto.LoginResponse;
 import com.ignis.API.entity.User;
 import com.ignis.API.service.UserService;
-
-import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -28,13 +34,24 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
-        boolean isAuthenticated = userService.login(loginRequest.getLogin(), loginRequest.getPassword());
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        String token = userService.login(loginRequest.getLogin(), loginRequest.getPassword());
 
-        if (isAuthenticated) {
-            return ResponseEntity.ok("Zalogowano pomyślnie!");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nieprawidłowy login lub hasło!");
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Błędny login lub hasło");
         }
+
+        return ResponseEntity.ok(new LoginResponse(token));
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Masz dostęp do chronionego endpointu");
+    }
+
+    @GetMapping("/admin-test")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> adminTest() {
+        return ResponseEntity.ok("Masz dostęp jako ADMIN");
     }
 }

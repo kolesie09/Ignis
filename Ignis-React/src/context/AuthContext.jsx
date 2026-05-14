@@ -7,19 +7,16 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   // Tutaj przenosimy logikę, którą miałeś wcześniej w App.js
   const [authenticated, setAuthenticated] = useState(
-    localStorage.getItem("authenticated") === "true"
+    !!localStorage.getItem("token"),
   );
 
-  // Funkcja logowania
   const login = () => {
     setAuthenticated(true);
-    localStorage.setItem("authenticated", "true");
   };
 
-  // Funkcja wylogowania
   const logout = () => {
     setAuthenticated(false);
-    localStorage.removeItem("authenticated");
+    localStorage.removeItem("token");
   };
 
   // Przekazujemy te wartości w dół do każdego komponentu w aplikacji
