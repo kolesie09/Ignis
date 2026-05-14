@@ -4,4 +4,5 @@
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/LoginRequest.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/entity/User.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/repository/UserRepository.java
+/home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/security/JwtService.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/service/UserService.java
