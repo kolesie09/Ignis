@@ -11,6 +11,7 @@ import History from "../pages/documents/History.jsx";
 import CardDeparture from "../pages/documents/card/CardDeparture.jsx";
 import CardDepartureUser from "../pages/documents/card/CardDepartureUser.jsx";
 import { RequireAuth } from "../context/RequireAuth.jsx";
+import Firefighters from "../pages/firefighters/Firefighters.jsx";
 
 export const router = createBrowserRouter([
   // Strony publiczne
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
       {
         path: "dashboard",
         element: <Home />,
+      },
+      {
+        path: "firefighters",
+        element: <Firefighters />,
       },
       {
         path: "documents/history/card/:id",

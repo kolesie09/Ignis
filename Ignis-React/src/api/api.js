@@ -1,7 +1,7 @@
 export const apiFetch = async (url, options = {}) => {
   const token = localStorage.getItem("token");
 
-  return fetch(`http://localhost:8080${url}`, {
+  const response = await fetch(`http://localhost:8080${url}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -9,4 +9,11 @@ export const apiFetch = async (url, options = {}) => {
       ...options.headers,
     },
   });
+
+  if (response.status === 401 || response.status === 403) {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  }
+
+  return response;
 };
