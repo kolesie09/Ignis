@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useRef,
-} from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { Card, CardBody, CardHeader } from "../Card";
 import SelectInput from "../../components/SelectInput";
 import { Button } from "../../components/Button.jsx";
@@ -15,122 +9,154 @@ export default function CrewCar({
   value,
   onChange,
   className = "",
-  firefightersCount = 4,
-
-  // 🔽 NOWE: globalne wykluczenia (np. osoby użyte w innych pojazdach)
-  exclude = [], // Array<string>
-  // 🔽 NOWE: przycisk do automatycznej obsady
+  places = 6,
+  exclude = [],
   enableAutoAssign = false,
 }) {
+  const firefightersCount = Math.max(Number(places) - 2, 0);
+
   const [driver, setDriver] = useState(value?.driver ?? "");
   const [commander, setCommander] = useState(value?.commander ?? "");
   const [firefighters, setFirefighters] = useState(() => {
     const base = value?.firefighters ?? [];
-    return Array.from({ length: firefightersCount }, (_, i) => base[i] ?? "");
+
+    return Array.from(
+      { length: firefightersCount },
+      (_, index) => base[index] ?? "",
+    );
   });
 
   const prevValueRef = useRef();
 
-  // ——— Normalizacja opcji i zbiory pomocnicze ———
-  const asOption = (o) => (typeof o === "string" ? { label: o, value: o } : o);
+  const asOption = (option) =>
+    typeof option === "string" ? { label: option, value: option } : option;
+
   const normTeams = useMemo(() => teams.map(asOption), [teams]);
   const excludeSet = useMemo(() => new Set(exclude.filter(Boolean)), [exclude]);
 
   const selectedSet = useMemo(
     () => new Set([driver, commander, ...firefighters].filter(Boolean)),
-    [driver, commander, firefighters]
+    [driver, commander, firefighters],
   );
 
-  const valueOf = (o) => (typeof o === "string" ? o : o?.value ?? "");
+  const valueOf = (option) =>
+    typeof option === "string" ? option : (option?.value ?? "");
 
-  // ——— Filtrowanie opcji: bez duplikatów w tej karcie + globalne exclude ———
   const filteredOptionsFor = (currentValue) =>
-    normTeams.filter((o) => {
-      const v = valueOf(o);
-      if (v === currentValue) return true; // zachowaj aktualną wartość pola
-      if (selectedSet.has(v)) return false; // unikaj duplikatów wewnątrz karty
-      if (excludeSet.has(v)) return false; // globalne wykluczenia
+    normTeams.filter((option) => {
+      const optionValue = valueOf(option);
+
+      if (optionValue === currentValue) {
+        return true;
+      }
+
+      if (selectedSet.has(optionValue)) {
+        return false;
+      }
+
+      if (excludeSet.has(optionValue)) {
+        return false;
+      }
+
       return true;
     });
 
-  // Synchronizacja przy zewnętrznej zmianie value (tryb kontrolowany)
   useEffect(() => {
-    if (!value) return;
+    if (!value) {
+      return;
+    }
+
     setDriver(value.driver ?? "");
     setCommander(value.commander ?? "");
     setFirefighters(
       Array.from(
         { length: firefightersCount },
-        (_, i) => value.firefighters?.[i] ?? ""
-      )
+        (_, index) => value.firefighters?.[index] ?? "",
+      ),
     );
-  }, [value]); // Użyj value jako zależności
+  }, [value, firefightersCount]);
 
-  // 🔧 NOWE: gdy NIE używasz `value` (tryb niekontrolowany), zmiana firefightersCount przeskaluje tablicę
   useEffect(() => {
-    if (value) return; // W trybie kontrolowanym robi to efekt powyżej
+    if (value) {
+      return;
+    }
+
     setFirefighters((prev) => {
-      if (prev.length === firefightersCount) return prev; // Unikaj aktualizacji, jeśli długość jest taka sama
+      if (prev.length === firefightersCount) {
+        return prev;
+      }
+
       const next = prev.slice(0, firefightersCount);
-      while (next.length < firefightersCount) next.push("");
+
+      while (next.length < firefightersCount) {
+        next.push("");
+      }
+
       return next;
     });
-  }, [firefightersCount]); // Usuń value z zależności
+  }, [value, firefightersCount]);
 
-  // Propagacja do rodzica
   useEffect(() => {
-    const current = { driver, commander, firefighters };
+    const current = {
+      driver,
+      commander,
+      firefighters,
+    };
+
     if (JSON.stringify(current) !== JSON.stringify(prevValueRef.current)) {
       prevValueRef.current = current;
+
       if (onChange) {
         onChange(current);
       }
     }
-  }, [driver, commander, firefighters]); // Usuń onChange z zależności
+  }, [driver, commander, firefighters, onChange]);
 
-  const updateFirefighter = (idx, v) => {
+  const updateFirefighter = (index, newValue) => {
     setFirefighters((prev) => {
       const next = [...prev];
-      next[idx] = v;
+      next[index] = newValue;
+
       return next;
     });
   };
 
-  // 🔽 NOWE: auto-obsada (z poszanowaniem exclude i bieżących wyborów)
   const autoAssign = () => {
     const candidates = normTeams.map(valueOf);
-    const taken = new Set([...excludeSet]); // nie używaj globalnie zajętych
+    const taken = new Set([...excludeSet]);
 
-    // zablokuj już unikalnie wybrane w tej karcie
     [driver, commander, ...firefighters]
       .filter(Boolean)
-      .forEach((x) => taken.add(x));
+      .forEach((person) => taken.add(person));
 
     const takeNext = (preferred) => {
       if (preferred && !taken.has(preferred)) {
         taken.add(preferred);
         return preferred;
       }
-      const found = candidates.find((c) => !taken.has(c));
+
+      const found = candidates.find((candidate) => !taken.has(candidate));
+
       if (found) {
         taken.add(found);
         return found;
       }
-      return ""; // zabrakło osób
+
+      return "";
     };
 
-    setDriver((d) => takeNext(d));
-    setCommander((c) => takeNext(c));
-    setFirefighters((arr) => {
-      const sized = arr.slice(0, firefightersCount);
-      while (sized.length < firefightersCount) sized.push("");
-      return sized.map((f) => takeNext(f));
+    setDriver((currentDriver) => takeNext(currentDriver));
+    setCommander((currentCommander) => takeNext(currentCommander));
+    setFirefighters((currentFirefighters) => {
+      const sized = currentFirefighters.slice(0, firefightersCount);
+
+      while (sized.length < firefightersCount) {
+        sized.push("");
+      }
+
+      return sized.map((firefighter) => takeNext(firefighter));
     });
   };
-
-  const handleChange = useCallback((newValue) => {
-    // logika obsługi zmiany
-  }, []);
 
   return (
     <Card className={className}>
@@ -164,14 +190,14 @@ export default function CrewCar({
           required
         />
 
-        {Array.from({ length: firefightersCount }).map((_, i) => (
+        {Array.from({ length: firefightersCount }).map((_, index) => (
           <SelectInput
-            key={i}
+            key={index}
             className="mt-5"
-            value={firefighters[i]}
-            onChange={(v) => updateFirefighter(i, v)}
-            options={filteredOptionsFor(firefighters[i])}
-            label="Strażak: "
+            value={firefighters[index]}
+            onChange={(newValue) => updateFirefighter(index, newValue)}
+            options={filteredOptionsFor(firefighters[index])}
+            label={`Strażak ${index + 1}: `}
             placeholder="— wybierz strażaka —"
             required
           />

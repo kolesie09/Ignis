@@ -30,9 +30,9 @@ export default function SelectInput({
         <select
           id={inputId}
           className="w-full appearance-none rounded-xl border border-gray-300 bg-white px-3 py-2 pr-9 text-sm shadow-sm
-                     focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500
-                     disabled:cursor-not-allowed disabled:bg-gray-100
-                     dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+           focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500
+           disabled:cursor-not-allowed disabled:opacity-100 disabled:bg-white
+           dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:disabled:bg-gray-900"
           value={value ?? ""}
           onChange={(e) => onChange(e.target.value)}
           required={required}
