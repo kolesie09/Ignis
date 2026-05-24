@@ -57,7 +57,12 @@ export default function DepartureCard() {
   const [vehicles, setVehicles] = useState([]);
   const [loadingVehicles, setLoadingVehicles] = useState(false);
 
+  const [firefighters, setFirefighters] = useState([]);
+  const [loadingFirefighters, setLoadingFirefighters] = useState(false);
+
   const [departureNumber, setDepartureNumber] = useState("");
+
+  const [formErrors, setFormErrors] = useState({});
 
   const [timeDeparture, setTimeDeparture] = useState("18:30");
   const [timeArrival, setTimeArrival] = useState("18:30");
@@ -108,14 +113,6 @@ export default function DepartureCard() {
   const [distanceModalError, setDistanceModalError] = useState("");
   const [reasonModalError, setReasonModalError] = useState("");
 
-  const reporters = [
-    "Kowalski",
-    "Nowak",
-    "Wiśniewski",
-    "Zieliński",
-    "Lewandowski",
-  ];
-
   const [crews, setCrews] = useState({});
 
   // Fetch vehicles on mount
@@ -136,7 +133,7 @@ export default function DepartureCard() {
         const vehicleOptions = data.map((vehicle) => ({
           id: String(vehicle.id),
           title: vehicle.title,
-          firefightersCount: vehicle.firefightersCount,
+          places: vehicle.places,
         }));
 
         setVehicles(vehicleOptions);
@@ -183,6 +180,38 @@ export default function DepartureCard() {
       [vehicleId]: value,
     }));
   };
+
+  useEffect(() => {
+    const fetchFirefighters = async () => {
+      try {
+        setLoadingFirefighters(true);
+
+        const response = await apiFetch("/api/firefighters");
+
+        if (!response.ok) {
+          console.error("Nie udało się pobrać strażaków");
+          return;
+        }
+
+        const data = await response.json();
+
+        const firefighterOptions = data.map((firefighter) => ({
+          value: String(firefighter.id),
+          label:
+            firefighter.nick ||
+            `${firefighter.lastname ?? ""} ${firefighter.name?.charAt(0) ?? ""}`.trim(),
+        }));
+
+        setFirefighters(firefighterOptions);
+      } catch (error) {
+        console.error("Błąd pobierania strażaków:", error);
+      } finally {
+        setLoadingFirefighters(false);
+      }
+    };
+
+    fetchFirefighters();
+  }, []);
 
   const getErrorMessage = async (response, fallbackMessage) => {
     try {
@@ -567,6 +596,143 @@ export default function DepartureCard() {
     }
   };
 
+  const clearFormError = (fieldName) => {
+    setFormErrors((prev) => {
+      const copy = { ...prev };
+      delete copy[fieldName];
+      return copy;
+    });
+  };
+
+  const validateDepartureCard = () => {
+    const errors = {};
+
+    if (!departureNumber.trim()) {
+      errors.departureNumber = "Podaj numer wyjazdu.";
+    }
+
+    if (!date) {
+      errors.date = "Wybierz datę zdarzenia.";
+    }
+
+    if (!timeDeparture) {
+      errors.timeDeparture = "Podaj godzinę rozpoczęcia.";
+    }
+
+    if (!timeArrival) {
+      errors.timeArrival = "Podaj godzinę zakończenia.";
+    }
+
+    if (timeDeparture && timeArrival && timeArrival < timeDeparture) {
+      errors.timeArrival =
+        "Godzina zakończenia nie może być wcześniejsza niż rozpoczęcia.";
+    }
+
+    if (!location) {
+      errors.location = "Wybierz miejscowość.";
+    }
+
+    if (streets.length > 0 && !street) {
+      errors.street = "Wybierz ulicę albo dodaj nową.";
+    }
+
+    if (!distance) {
+      errors.distance = "Wybierz liczbę kilometrów.";
+    }
+
+    if (!category) {
+      errors.category = "Wybierz kategorię.";
+    }
+
+    if (!reason) {
+      errors.reason = "Wybierz powód wyjazdu.";
+    }
+
+    const selectedVehicles = Object.entries(crews).filter(([_, crew]) => {
+      return (
+        crew.driver || crew.commander || (crew.firefighters || []).some(Boolean)
+      );
+    });
+
+    if (selectedVehicles.length === 0) {
+      errors.crews = "Uzupełnij obsadę przynajmniej jednego pojazdu.";
+    }
+
+    selectedVehicles.forEach(([vehicleId, crew]) => {
+      if (!crew.driver) {
+        errors[`crew_${vehicleId}_driver`] = "Wybierz kierowcę.";
+      }
+
+      if (!crew.commander) {
+        errors[`crew_${vehicleId}_commander`] = "Wybierz dowódcę.";
+      }
+    });
+
+    setFormErrors(errors);
+
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSaveDepartureCard = async () => {
+    const isValid = validateDepartureCard();
+
+    if (!isValid) {
+      return;
+    }
+
+    const selectedCrews = Object.entries(crews)
+      .filter(([_, crew]) => {
+        return (
+          crew.driver ||
+          crew.commander ||
+          (crew.firefighters || []).some(Boolean)
+        );
+      })
+      .map(([vehicleId, crew]) => ({
+        vehicleId: Number(vehicleId),
+        driverId: crew.driver ? Number(crew.driver) : null,
+        commanderId: crew.commander ? Number(crew.commander) : null,
+        firefighterIds: (crew.firefighters || [])
+          .filter(Boolean)
+          .map((firefighterId) => Number(firefighterId)),
+      }));
+
+    const departureCardData = {
+      departureNumber: departureNumber ? Number(departureNumber) : null,
+      date,
+      timeDeparture,
+      timeArrival,
+      cityId: location ? Number(location) : null,
+      streetId: street ? Number(street) : null,
+      distance: distance ? Number(distance) : null,
+      incidentId: reason ? Number(reason) : null,
+      crews: selectedCrews,
+    };
+
+    try {
+      const response = await apiFetch("/api/departure-cards", {
+        method: "POST",
+        body: JSON.stringify(departureCardData),
+      });
+
+      if (!response.ok) {
+        const message = await getErrorMessage(
+          response,
+          "Nie udało się zapisać karty wyjazdu.",
+        );
+
+        console.error(message);
+        return;
+      }
+
+      const savedCard = await response.json();
+
+      console.log("Zapisano kartę wyjazdu:", savedCard);
+    } catch (error) {
+      console.error("Błąd zapisu karty wyjazdu:", error);
+    }
+  };
+
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3 items-start auto-rows-auto">
@@ -584,8 +750,16 @@ export default function DepartureCard() {
                   dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100"
                 placeholder="Wpisz numer wyjazdu ..."
                 value={departureNumber}
-                onChange={(e) => setDepartureNumber(e.target.value)}
+                onChange={(e) => {
+                  setDepartureNumber(e.target.value);
+                  clearFormError("departureNumber");
+                }}
               />
+              {formErrors.departureNumber && (
+                <p className="mt-2 text-sm text-red-600">
+                  {formErrors.departureNumber}
+                </p>
+              )}
             </div>
 
             <TimeInput
@@ -594,8 +768,9 @@ export default function DepartureCard() {
               onChange={setTimeDeparture}
               label="Godzina rozpoczęcia: "
               minuteStep={5}
-              min="06:00"
-              max="22:00"
+              min="00:00"
+              max="23:59"
+              error={formErrors.timeDeparture}
             />
 
             <TimeInput
@@ -604,8 +779,9 @@ export default function DepartureCard() {
               onChange={setTimeArrival}
               label="Godzina zakończenia: "
               minuteStep={5}
-              min="06:00"
-              max="22:00"
+              min="00:00"
+              max="23:59"
+              error={formErrors.timeArrival}
             />
 
             <DateInput
@@ -614,8 +790,9 @@ export default function DepartureCard() {
               onChange={setDate}
               label="Data zdarzenia: "
               dayStep={1}
-              min={toISODate(today)}
+              min="2000-01-01"
               max={toISODate(nextYear)}
+              error={formErrors.date}
             />
           </CardBody>
         </Card>
@@ -635,6 +812,7 @@ export default function DepartureCard() {
                       : "— wybierz miejscowość —"
                   }
                   disabled={loadingCities}
+                  error={formErrors.location}
                   required
                 />
               </div>
@@ -661,10 +839,13 @@ export default function DepartureCard() {
                       ? "— najpierw wybierz miejscowość —"
                       : loadingStreets
                         ? "Ładowanie ulic..."
-                        : "— wybierz ulicę —"
+                        : streets.length === 0
+                          ? "— brak ulic dla miejscowości —"
+                          : "— wybierz ulicę —"
                   }
                   required
                   disabled={!location || loadingStreets}
+                  error={formErrors.street}
                 />
               </div>
 
@@ -688,6 +869,7 @@ export default function DepartureCard() {
                   label="Liczba kilometrów: "
                   placeholder="— wybierz liczbę kilometrów —"
                   required
+                  error={formErrors.distance}
                 />
               </div>
 
@@ -717,6 +899,7 @@ export default function DepartureCard() {
               }
               disabled={loadingCategories}
               required
+              error={formErrors.category}
             />
 
             <div className="mt-5 flex items-center gap-2">
@@ -734,6 +917,7 @@ export default function DepartureCard() {
                         : "— wybierz powód —"
                   }
                   disabled={!category || loadingReasons}
+                  error={formErrors.reason}
                   required
                 />
               </div>
@@ -754,6 +938,12 @@ export default function DepartureCard() {
         <Card className="lg:col-span-3 lg:row-start-2">
           <CardBody className="p-4">
             <div className="grid sm:grid-cols-1 lg:grid-cols-4 gap-4">
+              {loadingFirefighters && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Ładowanie strażaków...
+                </p>
+              )}
+
               {loadingVehicles ? (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Ładowanie pojazdów...
@@ -767,19 +957,32 @@ export default function DepartureCard() {
                   <CrewCar
                     key={vehicle.id}
                     title={vehicle.title}
-                    teams={reporters}
+                    teams={firefighters}
                     value={
-                      crews[vehicle.id] || emptyCrew(vehicle.firefightersCount)
+                      crews[vehicle.id] ||
+                      emptyCrew(Math.max(Number(vehicle.places) - 2, 0))
                     }
                     onChange={(value) => handleChangeCrew(vehicle.id, value)}
-                    firefightersCount={vehicle.firefightersCount}
+                    places={vehicle.places}
                     exclude={excludeFor(vehicle.id)}
                   />
                 ))
               )}
             </div>
+            {formErrors.crews && (
+              <p className="mt-3 text-sm text-red-600">{formErrors.crews}</p>
+            )}
           </CardBody>
         </Card>
+        <div className="lg:col-span-3 flex justify-end">
+          <button
+            type="button"
+            onClick={handleSaveDepartureCard}
+            className="rounded-xl bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700"
+          >
+            Zapisz kartę wyjazdu
+          </button>
+        </div>
       </div>
 
       <AddItemModal

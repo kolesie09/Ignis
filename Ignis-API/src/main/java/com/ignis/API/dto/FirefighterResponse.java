@@ -12,13 +12,15 @@ public class FirefighterResponse {
     private String status;
     private String fireStation;
     private List<String> roles;
+    private String nick;
 
-    public FirefighterResponse(Integer id, String login, String name, String lastname, String email, String status, String fireStation, List<String> roles) {
+    public FirefighterResponse(Integer id, String login, String name, String lastname, String email, String status, String fireStation, List<String> roles, String nick) {
         this.id = id;
         this.login = login;
         this.name = name;
         this.lastname = lastname;
         this.email = email;
+        this.nick = nick;
         this.status = status;
         this.fireStation = fireStation;
         this.roles = roles;
@@ -54,6 +56,10 @@ public class FirefighterResponse {
 
     public List<String> getRoles() {
         return roles;
+    }
+
+    public String getNick() {
+        return nick;
     }
 
 }

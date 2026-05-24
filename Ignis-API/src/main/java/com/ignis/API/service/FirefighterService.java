@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.ignis.API.dto.FirefighterResponse;
 import com.ignis.API.entity.Firefighter;
 import com.ignis.API.entity.Role;
+import com.ignis.API.entity.User;
 import com.ignis.API.exception.ResourceNotFoundException;
 import com.ignis.API.repository.FirefighterRepository;
 
@@ -20,21 +21,51 @@ public class FirefighterService {
     }
 
     private FirefighterResponse mapToResponse(Firefighter firefighter) {
-        List<String> roles = firefighter.getUser().getRoles()
+        User user = firefighter.getUser();
+
+        List<String> roles = user.getRoles()
                 .stream()
                 .map(Role::getName)
                 .toList();
 
+        String nick = buildNick(user, firefighter.getId());
+
         return new FirefighterResponse(
                 firefighter.getId(),
-                firefighter.getUser().getLogin(),
-                firefighter.getUser().getName(),
-                firefighter.getUser().getLastname(),
-                firefighter.getUser().getEmail(),
+                user.getLogin(),
+                user.getName(),
+                user.getLastname(),
+                user.getEmail(),
                 firefighter.getFirefighterStatus().getName(),
                 firefighter.getFireStation().getName(),
-                roles
+                roles,
+                nick
         );
+    }
+
+    private String buildNick(User user, Integer firefighterId) {
+        if (user == null) {
+            return "Strażak " + firefighterId;
+        }
+
+        if (user.getNick() != null && !user.getNick().isBlank()) {
+            return user.getNick();
+        }
+
+        String firstName = user.getName() == null ? "" : user.getName();
+        String lastname = user.getLastname() == null ? "" : user.getLastname();
+
+        if (!firstName.isBlank() && !lastname.isBlank()) {
+            return lastname + " " + firstName.charAt(0);
+        }
+
+        String fullName = (firstName + " " + lastname).trim();
+
+        if (!fullName.isBlank()) {
+            return fullName;
+        }
+
+        return "Strażak " + firefighterId;
     }
 
     public List<FirefighterResponse> getAllFirefighters() {

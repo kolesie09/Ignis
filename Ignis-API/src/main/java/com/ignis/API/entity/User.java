@@ -32,6 +32,7 @@ public class User {
     private String name;
     private String lastname;
     private LocalDate dateOfBirth;
+    private String nick;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
