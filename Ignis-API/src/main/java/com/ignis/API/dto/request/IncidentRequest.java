@@ -1,15 +1,15 @@
-package com.ignis.API.dto;
+package com.ignis.API.dto.request;
 
 public class IncidentRequest {
 
     private String name;
-    private Integer incidentTypeId;
+    private Long incidentTypeId;
 
     public String getName() {
         return name;
     }
 
-    public Integer getIncidentTypeId() {
+    public Long getIncidentTypeId() {
         return incidentTypeId;
     }
 
@@ -17,7 +17,7 @@ public class IncidentRequest {
         this.name = name;
     }
 
-    public void setIncidentTypeId(Integer incidentTypeId) {
+    public void setIncidentTypeId(Long incidentTypeId) {
         this.incidentTypeId = incidentTypeId;
     }
 }

@@ -1,10 +1,10 @@
-package com.ignis.API.dto;
+package com.ignis.API.dto.response;
 
 import java.util.List;
 
 public class FirefighterResponse {
 
-    private Integer id;
+    private Long id;
     private String login;
     private String name;
     private String lastname;
@@ -14,7 +14,7 @@ public class FirefighterResponse {
     private List<String> roles;
     private String nick;
 
-    public FirefighterResponse(Integer id, String login, String name, String lastname, String email, String status, String fireStation, List<String> roles, String nick) {
+    public FirefighterResponse(Long id, String login, String name, String lastname, String email, String status, String fireStation, List<String> roles, String nick) {
         this.id = id;
         this.login = login;
         this.name = name;
@@ -26,7 +26,7 @@ public class FirefighterResponse {
         this.roles = roles;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

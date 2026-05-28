@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.ignis.API.dto.CityResponse;
-import com.ignis.API.dto.CreateCityRequest;
+import com.ignis.API.dto.request.CreateCityRequest;
+import com.ignis.API.dto.response.CityResponse;
 import com.ignis.API.entity.City;
 import com.ignis.API.entity.Firefighter;
 import com.ignis.API.exception.DuplicateResourceException;

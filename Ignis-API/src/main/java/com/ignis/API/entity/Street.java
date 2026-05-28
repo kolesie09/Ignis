@@ -18,7 +18,7 @@ public class Street {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -45,7 +45,7 @@ public class Street {
         this.createdBy = createdBy;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

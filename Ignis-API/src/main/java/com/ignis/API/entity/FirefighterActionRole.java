@@ -15,7 +15,7 @@ public class FirefighterActionRole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "vehicle_to_card_id", nullable = false)
@@ -42,7 +42,7 @@ public class FirefighterActionRole {
         this.firefighter = firefighter;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 }

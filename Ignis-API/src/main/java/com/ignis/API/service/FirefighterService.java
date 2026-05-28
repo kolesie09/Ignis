@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.ignis.API.dto.FirefighterResponse;
+import com.ignis.API.dto.response.FirefighterResponse;
 import com.ignis.API.entity.Firefighter;
 import com.ignis.API.entity.Role;
 import com.ignis.API.entity.User;
@@ -43,7 +43,7 @@ public class FirefighterService {
         );
     }
 
-    private String buildNick(User user, Integer firefighterId) {
+    private String buildNick(User user, Long firefighterId) {
         if (user == null) {
             return "Strażak " + firefighterId;
         }
@@ -75,7 +75,7 @@ public class FirefighterService {
                 .toList();
     }
 
-    public FirefighterResponse getFirefighterById(Integer id) {
+    public FirefighterResponse getFirefighterById(Long id) {
         Firefighter firefighter = firefighterRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka o ID: " + id));
 

@@ -1,18 +1,18 @@
-package com.ignis.API.dto;
+package com.ignis.API.dto.response;
 
 public class VehicleResponse {
 
-    private Integer id;
+    private Long id;
     private String title;
     private Integer firefightersCount;
 
-    public VehicleResponse(Integer id, String title, Integer firefightersCount) {
+    public VehicleResponse(Long id, String title, Integer firefightersCount) {
         this.id = id;
         this.title = title;
         this.firefightersCount = firefightersCount;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

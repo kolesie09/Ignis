@@ -2,13 +2,15 @@ package com.ignis.API.service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ignis.API.dto.DepartureCardRequest;
-import com.ignis.API.dto.DepartureCardResponse;
-import com.ignis.API.dto.VehicleCrewRequest;
+import com.ignis.API.dto.request.DepartureCardRequest;
+import com.ignis.API.dto.request.VehicleCrewRequest;
+import com.ignis.API.dto.response.DepartureCardHistoryResponse;
+import com.ignis.API.dto.response.DepartureCardResponse;
 import com.ignis.API.entity.Card;
 import com.ignis.API.entity.City;
 import com.ignis.API.entity.EmailSend;
@@ -111,7 +113,7 @@ public class DepartureCardService {
 
         EmailSend emailSend = emailSendRepository.save(new EmailSend(emailStatus));
 
-        Integer commanderId = request.getCrews()
+        Long commanderId = request.getCrews()
                 .stream()
                 .filter(crew -> crew.getCommanderId() != null)
                 .findFirst()
@@ -186,7 +188,7 @@ public class DepartureCardService {
     private void saveFirefighterRole(
             Card card,
             Garage garage,
-            Integer firefighterId,
+            Long firefighterId,
             TypeFunction typeFunction
     ) {
         Firefighter firefighter = firefighterRepository.findById(firefighterId)
@@ -213,5 +215,41 @@ public class DepartureCardService {
                 .orElseGet(() -> placeRepository.save(
                 new Place(city, street, createdBy)
         ));
+    }
+
+    public List<DepartureCardHistoryResponse> getCardHistory() {
+        List<Card> cards = cardRepository.findAllByOrderByDepartureDateDesc();
+
+        return cards.stream().map(card -> {
+            String cityName = card.getPlace().getCity().getName();
+
+            String streetName = card.getPlace().getStreet() != null
+                    ? card.getPlace().getStreet().getName()
+                    : null;
+
+            String placeName = streetName != null
+                    ? cityName + ", " + streetName
+                    : cityName;
+
+            String incidentName = card.getIncident().getName();
+
+            String commanderName = card.getCommander().getUser().getName()
+                    + " "
+                    + card.getCommander().getUser().getLastname();
+
+            String typeCardName = card.getTypeCard().getName();
+
+            return new DepartureCardHistoryResponse(
+                    card.getId(),
+                    card.getDepartureNumber(),
+                    card.getDepartureDate(),
+                    card.getDepartureTime(),
+                    card.getReturnTime(),
+                    placeName,
+                    incidentName,
+                    commanderName,
+                    typeCardName
+            );
+        }).toList();
     }
 }

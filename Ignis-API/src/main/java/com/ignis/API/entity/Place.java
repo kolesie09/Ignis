@@ -15,7 +15,7 @@ public class Place {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "city_id", nullable = false)
@@ -38,7 +38,7 @@ public class Place {
         this.createdBy = createdBy;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

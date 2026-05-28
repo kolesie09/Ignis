@@ -1,14 +1,18 @@
 package com.ignis.API.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ignis.API.dto.DepartureCardRequest;
-import com.ignis.API.dto.DepartureCardResponse;
+import com.ignis.API.dto.request.DepartureCardRequest;
+import com.ignis.API.dto.response.DepartureCardHistoryResponse;
+import com.ignis.API.dto.response.DepartureCardResponse;
 import com.ignis.API.service.DepartureCardService;
 
 @RestController
@@ -31,5 +35,10 @@ public class DepartureCardController {
         return ResponseEntity.ok(
                 departureCardService.createDepartureCard(request, login)
         );
+    }
+
+    @GetMapping
+    public ResponseEntity<List<DepartureCardHistoryResponse>> getCardHistory() {
+        return ResponseEntity.ok(departureCardService.getCardHistory());
     }
 }

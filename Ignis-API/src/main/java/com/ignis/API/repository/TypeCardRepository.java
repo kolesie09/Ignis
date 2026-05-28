@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ignis.API.entity.TypeCard;
 
-public interface TypeCardRepository extends JpaRepository<TypeCard, Integer> {
+public interface TypeCardRepository extends JpaRepository<TypeCard, Long> {
 
     Optional<TypeCard> findByName(String name);
 }

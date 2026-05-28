@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.ignis.API.entity.IncidentType;
 import com.ignis.API.entity.TypeCard;
 
-public interface IncidentTypeRepository extends JpaRepository<IncidentType, Integer> {
+public interface IncidentTypeRepository extends JpaRepository<IncidentType, Long> {
 
     List<IncidentType> findByTypeCard(TypeCard typeCard);
 

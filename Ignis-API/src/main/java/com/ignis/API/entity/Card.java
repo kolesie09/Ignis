@@ -19,7 +19,7 @@ public class Card {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "departure_number", nullable = false)
     private Integer departureNumber;
@@ -89,11 +89,52 @@ public class Card {
         this.createdBy = createdBy;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
     public Integer getDepartureNumber() {
         return departureNumber;
     }
+
+    public LocalDate getDepartureDate() {
+        return departureDate;
+    }
+
+    public LocalTime getDepartureTime() {
+        return departureTime;
+    }
+
+    public LocalTime getReturnTime() {
+        return returnTime;
+    }
+
+    public Integer getTrip() {
+        return trip;
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public Incident getIncident() {
+        return incident;
+    }
+
+    public EmailSend getEmailSend() {
+        return emailSend;
+    }
+
+    public Firefighter getCommander() {
+        return commander;
+    }
+
+    public TypeCard getTypeCard() {
+        return typeCard;
+    }
+
+    public Firefighter getCreatedBy() {
+        return createdBy;
+    }
+
 }

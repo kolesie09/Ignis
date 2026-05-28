@@ -1,9 +1,9 @@
-package com.ignis.API.dto;
+package com.ignis.API.dto.request;
 
 public class CreateStreetRequest {
 
     private String name;
-    private Integer cityId;
+    private Long cityId;
 
     public CreateStreetRequest() {
     }
@@ -12,7 +12,7 @@ public class CreateStreetRequest {
         return name;
     }
 
-    public Integer getCityId() {
+    public Long getCityId() {
         return cityId;
     }
 }

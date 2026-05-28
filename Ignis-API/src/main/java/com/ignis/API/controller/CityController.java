@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ignis.API.dto.CityResponse;
-import com.ignis.API.dto.CreateCityRequest;
+import com.ignis.API.dto.request.CreateCityRequest;
+import com.ignis.API.dto.response.CityResponse;
 import com.ignis.API.service.CityService;
 
 @RestController

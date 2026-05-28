@@ -15,7 +15,7 @@ public class IncidentType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -31,7 +31,7 @@ public class IncidentType {
         this.typeCard = typeCard;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

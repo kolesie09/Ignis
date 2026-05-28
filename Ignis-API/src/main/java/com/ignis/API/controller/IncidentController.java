@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ignis.API.dto.IncidentRequest;
-import com.ignis.API.dto.IncidentResponse;
+import com.ignis.API.dto.request.IncidentRequest;
+import com.ignis.API.dto.response.IncidentResponse;
 import com.ignis.API.entity.Firefighter;
 import com.ignis.API.entity.Incident;
 import com.ignis.API.entity.IncidentType;
@@ -39,7 +39,7 @@ public class IncidentController {
 
     @GetMapping
     public ResponseEntity<List<IncidentResponse>> getIncidentsByIncidentType(
-            @RequestParam Integer incidentTypeId
+            @RequestParam Long incidentTypeId
     ) {
         IncidentType incidentType = incidentTypeRepository.findById(incidentTypeId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono kategorii zdarzenia."));
@@ -88,7 +88,7 @@ public class IncidentController {
         }
 
         Firefighter createdBy = firefighterRepository
-                .findById(1)
+                .findById(1L)// TUTAJ TRZEBA ZROBIĆ BY SAMO Z BAZY POBIERAŁO 
                 .orElse(null);
 
         if (createdBy == null) {

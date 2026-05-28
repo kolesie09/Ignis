@@ -1,4 +1,4 @@
-package com.ignis.API.dto;
+package com.ignis.API.dto.request;
 
 public class CreateCityRequest {
 

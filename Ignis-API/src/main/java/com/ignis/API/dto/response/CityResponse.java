@@ -1,16 +1,16 @@
-package com.ignis.API.dto;
+package com.ignis.API.dto.response;
 
-public class IncidentResponse {
+public class CityResponse {
 
-    private Integer id;
+    private Long id;
     private String name;
 
-    public IncidentResponse(Integer id, String name) {
+    public CityResponse(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

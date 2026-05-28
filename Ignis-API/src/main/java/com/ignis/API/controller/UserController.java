@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ignis.API.dto.LoginRequest;
-import com.ignis.API.dto.LoginResponse;
+import com.ignis.API.dto.request.LoginRequest;
+import com.ignis.API.dto.response.LoginResponse;
 import com.ignis.API.entity.User;
 import com.ignis.API.service.UserService;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "${app.cors.allowed-origin-patterns}")
 @RestController
 @RequestMapping("/api/users") // Główny adres dla tego kontrolera 🌐
 public class UserController {

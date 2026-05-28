@@ -13,7 +13,7 @@ public class Garage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "car_operational_number")
     private String carOperationalNumber;
@@ -21,7 +21,7 @@ public class Garage {
     @Column(name = "places")
     private Integer places;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

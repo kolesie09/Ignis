@@ -18,7 +18,7 @@ public class City {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -42,7 +42,7 @@ public class City {
         this.createdBy = createdBy;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

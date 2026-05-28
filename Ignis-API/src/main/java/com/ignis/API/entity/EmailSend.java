@@ -15,7 +15,7 @@ public class EmailSend {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "email_status_id", nullable = false)
@@ -28,7 +28,7 @@ public class EmailSend {
         this.emailStatus = emailStatus;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

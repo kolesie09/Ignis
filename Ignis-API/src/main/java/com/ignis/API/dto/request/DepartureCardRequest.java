@@ -1,4 +1,4 @@
-package com.ignis.API.dto;
+package com.ignis.API.dto.request;
 
 import java.util.List;
 
@@ -8,10 +8,10 @@ public class DepartureCardRequest {
     private String date;
     private String timeDeparture;
     private String timeArrival;
-    private Integer cityId;
-    private Integer streetId;
+    private Long cityId;
+    private Long streetId;
     private Integer distance;
-    private Integer incidentId;
+    private Long incidentId;
     private List<VehicleCrewRequest> crews;
 
     public Integer getDepartureNumber() {
@@ -30,11 +30,11 @@ public class DepartureCardRequest {
         return timeArrival;
     }
 
-    public Integer getCityId() {
+    public Long getCityId() {
         return cityId;
     }
 
-    public Integer getStreetId() {
+    public Long getStreetId() {
         return streetId;
     }
 
@@ -42,7 +42,7 @@ public class DepartureCardRequest {
         return distance;
     }
 
-    public Integer getIncidentId() {
+    public Long getIncidentId() {
         return incidentId;
     }
 
@@ -66,11 +66,11 @@ public class DepartureCardRequest {
         this.timeArrival = timeArrival;
     }
 
-    public void setCityId(Integer cityId) {
+    public void setCityId(Long cityId) {
         this.cityId = cityId;
     }
 
-    public void setStreetId(Integer streetId) {
+    public void setStreetId(Long streetId) {
         this.streetId = streetId;
     }
 
@@ -78,7 +78,7 @@ public class DepartureCardRequest {
         this.distance = distance;
     }
 
-    public void setIncidentId(Integer incidentId) {
+    public void setIncidentId(Long incidentId) {
         this.incidentId = incidentId;
     }
 

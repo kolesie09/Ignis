@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.ignis.API.dto.CreateStreetRequest;
-import com.ignis.API.dto.StreetResponse;
+import com.ignis.API.dto.request.CreateStreetRequest;
+import com.ignis.API.dto.response.StreetResponse;
 import com.ignis.API.entity.City;
 import com.ignis.API.entity.Firefighter;
 import com.ignis.API.entity.Street;
@@ -31,7 +31,7 @@ public class StreetService {
         this.firefighterRepository = firefighterRepository;
     }
 
-    public List<StreetResponse> getStreetsByCity(Integer cityId) {
+    public List<StreetResponse> getStreetsByCity(Long cityId) {
         City city = cityRepository.findById(cityId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono miasta o ID: " + cityId));
 

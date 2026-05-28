@@ -8,7 +8,7 @@ import com.ignis.API.entity.City;
 import com.ignis.API.entity.Place;
 import com.ignis.API.entity.Street;
 
-public interface PlaceRepository extends JpaRepository<Place, Integer> {
+public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     Optional<Place> findByCityAndStreet(City city, Street street);
 

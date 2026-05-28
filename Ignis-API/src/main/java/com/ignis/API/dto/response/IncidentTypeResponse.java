@@ -1,16 +1,16 @@
-package com.ignis.API.dto;
+package com.ignis.API.dto.response;
 
 public class IncidentTypeResponse {
 
-    private Integer id;
+    private Long id;
     private String name;
 
-    public IncidentTypeResponse(Integer id, String name) {
+    public IncidentTypeResponse(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

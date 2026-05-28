@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ignis.API.dto.FirefighterResponse;
+import com.ignis.API.dto.response.FirefighterResponse;
 import com.ignis.API.service.FirefighterService;
 
 @RestController
@@ -28,7 +28,7 @@ public class FirefighterController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FirefighterResponse> getFirefighterById(@PathVariable Integer id) {
+    public ResponseEntity<FirefighterResponse> getFirefighterById(@PathVariable Long id) {
         return ResponseEntity.ok(firefighterService.getFirefighterById(id));
     }
 

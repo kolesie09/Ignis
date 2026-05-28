@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ignis.API.dto.CreateStreetRequest;
-import com.ignis.API.dto.StreetResponse;
+import com.ignis.API.dto.request.CreateStreetRequest;
+import com.ignis.API.dto.response.StreetResponse;
 import com.ignis.API.service.StreetService;
 
 @RestController
@@ -27,7 +27,7 @@ public class StreetController {
     }
 
     @GetMapping
-    public ResponseEntity<List<StreetResponse>> getStreetsByCity(@RequestParam Integer cityId) {
+    public ResponseEntity<List<StreetResponse>> getStreetsByCity(@RequestParam Long cityId) {
         return ResponseEntity.ok(streetService.getStreetsByCity(cityId));
     }
 

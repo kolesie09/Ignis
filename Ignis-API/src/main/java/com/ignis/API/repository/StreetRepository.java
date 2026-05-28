@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.ignis.API.entity.City;
 import com.ignis.API.entity.Street;
 
-public interface StreetRepository extends JpaRepository<Street, Integer> {
+public interface StreetRepository extends JpaRepository<Street, Long> {
 
     List<Street> findByCity(City city);
 

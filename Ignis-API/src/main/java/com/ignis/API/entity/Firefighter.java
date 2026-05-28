@@ -16,11 +16,19 @@ public class Firefighter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "name")
+    private User name;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "lastname")
+    private User lastname;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "firefighter_status_id", nullable = false)
@@ -33,12 +41,20 @@ public class Firefighter {
     public Firefighter() {
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
     public User getUser() {
         return user;
+    }
+
+    public User getName() {
+        return name;
+    }
+
+    public User getLastname() {
+        return lastname;
     }
 
     public FirefighterStatus getFirefighterStatus() {

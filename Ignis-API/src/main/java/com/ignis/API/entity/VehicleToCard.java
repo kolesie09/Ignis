@@ -15,7 +15,7 @@ public class VehicleToCard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "card_id", nullable = false)
@@ -38,7 +38,7 @@ public class VehicleToCard {
         this.garage = garage;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
