@@ -9,6 +9,7 @@ import Home from "../pages/Home.jsx";
 import History from "../pages/documents/History.jsx";
 
 import CardDeparture from "../pages/documents/card/CardDeparture.jsx";
+import CardDetails from "../pages/documents/card/CardDetails.jsx";
 import CardDepartureUser from "../pages/documents/card/CardDepartureUser.jsx";
 import { RequireAuth } from "../context/RequireAuth.jsx";
 import Firefighters from "../pages/firefighters/Firefighters.jsx";
@@ -46,7 +47,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "documents/history/card/:id",
-        element: <CardDeparture />,
+        element: <CardDetails />,
       },
       {
         path: "documents/history/:user",

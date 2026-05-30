@@ -95,7 +95,7 @@ export default function History() {
                         as="div"
                         className="relative inline-block text-left"
                       >
-                        <MenuButton className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                        <MenuButton className="p-2 rounded-lg text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800">
                           <MoreVertical className="h-4 w-4" />
                         </MenuButton>
                         <MenuItems
@@ -110,6 +110,7 @@ export default function History() {
                               onClick={() => {
                                 setSelected(r);
                                 setOpenRight(true);
+                                navigate("/documents/history/card/" + r.id);
                               }}
                               className="group flex w-full items-center justify-center rounded-md px-2 py-2 text-sm text-gray-900 dark:text-gray-100 data-[focus]:bg-blue-500 data-[focus]:text-white"
                             >

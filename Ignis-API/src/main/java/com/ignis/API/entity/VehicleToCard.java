@@ -22,19 +22,16 @@ public class VehicleToCard {
     private Card card;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "firefighter_id", nullable = false)
-    private Firefighter firefighter;
-
-    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "garage_id", nullable = false)
     private Garage garage;
 
     public VehicleToCard() {
     }
 
-    public VehicleToCard(Card card, Firefighter firefighter, Garage garage) {
+    public VehicleToCard(Card card, Garage garage) {
+
         this.card = card;
-        this.firefighter = firefighter;
+
         this.garage = garage;
     }
 
@@ -44,10 +41,6 @@ public class VehicleToCard {
 
     public Card getCard() {
         return card;
-    }
-
-    public Firefighter getFirefighter() {
-        return firefighter;
     }
 
     public Garage getGarage() {

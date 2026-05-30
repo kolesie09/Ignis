@@ -45,4 +45,16 @@ public class FirefighterActionRole {
     public Long getId() {
         return id;
     }
+
+    public VehicleToCard getVehicleToCard() {
+        return vehicleToCard;
+    }
+
+    public TypeFunction getTypeFunction() {
+        return typeFunction;
+    }
+
+    public Firefighter getFirefighter() {
+        return firefighter;
+    }
 }

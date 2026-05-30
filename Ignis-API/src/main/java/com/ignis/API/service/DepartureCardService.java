@@ -9,8 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ignis.API.dto.request.DepartureCardRequest;
 import com.ignis.API.dto.request.VehicleCrewRequest;
+import com.ignis.API.dto.response.CrewMemberResponse;
+import com.ignis.API.dto.response.DepartureCardDetailsResponse;
 import com.ignis.API.dto.response.DepartureCardHistoryResponse;
 import com.ignis.API.dto.response.DepartureCardResponse;
+import com.ignis.API.dto.response.VehicleCrewResponse;
 import com.ignis.API.entity.Card;
 import com.ignis.API.entity.City;
 import com.ignis.API.entity.EmailSend;
@@ -163,18 +166,21 @@ public class DepartureCardService {
         for (VehicleCrewRequest crew : request.getCrews()) {
             Garage garage = garageRepository.findById(crew.getVehicleId())
                     .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono pojazdu."));
+            VehicleToCard vehicleToCard = vehicleToCardRepository.save(
+                    new VehicleToCard(card, garage)
+            );
 
             if (crew.getDriverId() != null) {
-                saveFirefighterRole(card, garage, crew.getDriverId(), driverFunction);
+                saveFirefighterRole(vehicleToCard, crew.getDriverId(), driverFunction);
             }
 
             if (crew.getCommanderId() != null) {
-                saveFirefighterRole(card, garage, crew.getCommanderId(), commanderFunction);
+                saveFirefighterRole(vehicleToCard, crew.getCommanderId(), commanderFunction);
             }
 
             if (crew.getFirefighterIds() != null) {
                 crew.getFirefighterIds().forEach(firefighterId
-                        -> saveFirefighterRole(card, garage, firefighterId, firefighterFunction)
+                        -> saveFirefighterRole(vehicleToCard, firefighterId, firefighterFunction)
                 );
             }
         }
@@ -186,17 +192,12 @@ public class DepartureCardService {
     }
 
     private void saveFirefighterRole(
-            Card card,
-            Garage garage,
+            VehicleToCard vehicleToCard,
             Long firefighterId,
             TypeFunction typeFunction
     ) {
         Firefighter firefighter = firefighterRepository.findById(firefighterId)
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka."));
-
-        VehicleToCard vehicleToCard = vehicleToCardRepository.save(
-                new VehicleToCard(card, firefighter, garage)
-        );
 
         firefighterActionRoleRepository.save(
                 new FirefighterActionRole(vehicleToCard, typeFunction, firefighter)
@@ -251,5 +252,68 @@ public class DepartureCardService {
                     typeCardName
             );
         }).toList();
+    }
+
+    public DepartureCardDetailsResponse getCardDetails(Long cardId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono karty wyjazdu."));
+
+        String cityName = card.getPlace().getCity().getName();
+
+        String streetName = card.getPlace().getStreet() != null
+                ? card.getPlace().getStreet().getName()
+                : null;
+
+        String incidentName = card.getIncident().getName();
+
+        String commanderName = card.getCommander().getUser().getName()
+                + " "
+                + card.getCommander().getUser().getLastname();
+
+        String typeCardName = card.getTypeCard().getName();
+
+        String createdByName = card.getCreatedBy().getUser().getName()
+                + " "
+                + card.getCreatedBy().getUser().getLastname();
+
+        List<VehicleCrewResponse> vehicleCrews = vehicleToCardRepository
+                .findByCardId(card.getId())
+                .stream()
+                .map(vehicleToCard -> {
+                    List<CrewMemberResponse> crew = firefighterActionRoleRepository
+                            .findByVehicleToCardId(vehicleToCard.getId())
+                            .stream()
+                            .map(role -> new CrewMemberResponse(
+                            role.getFirefighter().getId(),
+                            role.getFirefighter().getUser().getName()
+                            + " "
+                            + role.getFirefighter().getUser().getLastname(),
+                            role.getTypeFunction().getName()
+                    ))
+                            .toList();
+
+                    return new VehicleCrewResponse(
+                            vehicleToCard.getId(),
+                            vehicleToCard.getGarage().getId(),
+                            vehicleToCard.getGarage().getCarOperationalNumber(),
+                            crew
+                    );
+                })
+                .toList();
+
+        return new DepartureCardDetailsResponse(
+                card.getId(),
+                card.getDepartureNumber(),
+                card.getDepartureDate(),
+                card.getDepartureTime(),
+                card.getReturnTime(),
+                cityName,
+                streetName,
+                incidentName,
+                typeCardName,
+                commanderName,
+                createdByName,
+                vehicleCrews
+        );
     }
 }

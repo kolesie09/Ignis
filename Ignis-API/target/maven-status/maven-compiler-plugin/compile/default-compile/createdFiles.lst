@@ -1,9 +1,7 @@
 com/ignis/API/service/FirefighterService.class
-com/ignis/API/dto/LoginRequest.class
 com/ignis/API/ApiApplication.class
 com/ignis/API/security/JwtService.class
 com/ignis/API/repository/UserRepository.class
-com/ignis/API/dto/LoginResponse.class
 com/ignis/API/entity/FireStation.class
 com/ignis/API/service/UserService.class
 com/ignis/API/controller/UserController.class
