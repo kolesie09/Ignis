@@ -8,5 +8,5 @@ import com.ignis.API.entity.Card;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
 
-    List<Card> findAllByOrderByDepartureDateDesc();
+    List<Card> findAllByOrderByDepartureDateDescReturnTimeDescDepartureTimeDesc();
 }

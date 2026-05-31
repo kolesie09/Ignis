@@ -7,6 +7,7 @@ import Login from "../pages/auth/Login.jsx";
 import Register from "../pages/auth/Register.jsx";
 import Home from "../pages/Home.jsx";
 import History from "../pages/documents/History.jsx";
+import CardEdit from "../pages/documents/card/CardEdit.jsx";
 
 import CardDeparture from "../pages/documents/card/CardDeparture.jsx";
 import CardDetails from "../pages/documents/card/CardDetails.jsx";
@@ -48,6 +49,10 @@ export const router = createBrowserRouter([
       {
         path: "documents/history/card/:id",
         element: <CardDetails />,
+      },
+      {
+        path: "documents/history/card/:id/edit",
+        element: <CardEdit />,
       },
       {
         path: "documents/history/:user",

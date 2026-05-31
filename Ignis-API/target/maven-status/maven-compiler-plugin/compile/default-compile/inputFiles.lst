@@ -15,6 +15,8 @@
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/request/LoginRequest.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/request/VehicleCrewRequest.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/response/CityResponse.java
+/home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/response/CrewMemberResponse.java
+/home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/response/DepartureCardDetailsResponse.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/response/DepartureCardHistoryResponse.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/response/DepartureCardResponse.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/response/FirefighterResponse.java
@@ -22,6 +24,7 @@
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/response/IncidentTypeResponse.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/response/LoginResponse.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/response/StreetResponse.java
+/home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/response/VehicleCrewResponse.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/dto/response/VehicleResponse.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/entity/Card.java
 /home/kolesie09/Programowanie/Ignis/Ignis-API/src/main/java/com/ignis/API/entity/City.java

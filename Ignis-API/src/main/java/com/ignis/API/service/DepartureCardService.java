@@ -40,6 +40,7 @@ import com.ignis.API.repository.PlaceRepository;
 import com.ignis.API.repository.StreetRepository;
 import com.ignis.API.repository.TypeCardRepository;
 import com.ignis.API.repository.TypeFunctionRepository;
+import com.ignis.API.repository.UserRepository;
 import com.ignis.API.repository.VehicleToCardRepository;
 
 @Service
@@ -58,6 +59,7 @@ public class DepartureCardService {
     private final VehicleToCardRepository vehicleToCardRepository;
     private final FirefighterActionRoleRepository firefighterActionRoleRepository;
     private final TypeCardRepository typeCardRepository;
+    private final UserRepository userRepository;
 
     public DepartureCardService(
             CardRepository cardRepository,
@@ -72,7 +74,8 @@ public class DepartureCardService {
             TypeFunctionRepository typeFunctionRepository,
             VehicleToCardRepository vehicleToCardRepository,
             FirefighterActionRoleRepository firefighterActionRoleRepository,
-            TypeCardRepository typeCardRepository
+            TypeCardRepository typeCardRepository,
+            UserRepository userRepository
     ) {
         this.cardRepository = cardRepository;
         this.placeRepository = placeRepository;
@@ -87,8 +90,10 @@ public class DepartureCardService {
         this.vehicleToCardRepository = vehicleToCardRepository;
         this.firefighterActionRoleRepository = firefighterActionRoleRepository;
         this.typeCardRepository = typeCardRepository;
+        this.userRepository = userRepository;
     }
 
+    // Metoda do tworzenia karty wyjazdu
     @Transactional
     public DepartureCardResponse createDepartureCard(DepartureCardRequest request, String login) {
 
@@ -140,7 +145,9 @@ public class DepartureCardService {
                 emailSend,
                 commander,
                 typeCard,
-                createdBy
+                createdBy,
+                null,
+                true
         );
 
         Card savedCard = cardRepository.save(card);
@@ -154,6 +161,7 @@ public class DepartureCardService {
         );
     }
 
+    // Metoda pomocnicza do zapisywania załóg pojazdów i przypisywania ról strażakom
     private void saveCrews(DepartureCardRequest request, Card card) {
         if (request.getCrews() == null || request.getCrews().isEmpty()) {
             return;
@@ -163,6 +171,7 @@ public class DepartureCardService {
         TypeFunction commanderFunction = getTypeFunction("Dowódca");
         TypeFunction firefighterFunction = getTypeFunction("Strażak");
 
+        // Zapisz powiązania pojazdów z kartą i przypisz role strażakom
         for (VehicleCrewRequest crew : request.getCrews()) {
             Garage garage = garageRepository.findById(crew.getVehicleId())
                     .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono pojazdu."));
@@ -186,11 +195,13 @@ public class DepartureCardService {
         }
     }
 
+    // Metoda pomocnicza do pobierania TypeFunction po nazwie
     private TypeFunction getTypeFunction(String name) {
         return typeFunctionRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono funkcji: " + name));
     }
 
+    // Metoda pomocnicza do zapisywania roli strażaka w akcji
     private void saveFirefighterRole(
             VehicleToCard vehicleToCard,
             Long firefighterId,
@@ -204,6 +215,7 @@ public class DepartureCardService {
         );
     }
 
+    // Metoda pomocnicza do pobierania lub tworzenia miejsca
     private Place getOrCreatePlace(City city, Street street, Firefighter createdBy) {
         if (street == null) {
             return placeRepository.findByCityAndStreetIsNull(city)
@@ -218,8 +230,9 @@ public class DepartureCardService {
         ));
     }
 
+    // Metoda do pobierania historii kart wyjazdu
     public List<DepartureCardHistoryResponse> getCardHistory() {
-        List<Card> cards = cardRepository.findAllByOrderByDepartureDateDesc();
+        List<Card> cards = cardRepository.findAllByOrderByDepartureDateDescReturnTimeDescDepartureTimeDesc();
 
         return cards.stream().map(card -> {
             String cityName = card.getPlace().getCity().getName();
@@ -254,6 +267,7 @@ public class DepartureCardService {
         }).toList();
     }
 
+    // Metoda do pobierania szczegółów karty wyjazdu
     public DepartureCardDetailsResponse getCardDetails(Long cardId) {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono karty wyjazdu."));
@@ -315,5 +329,74 @@ public class DepartureCardService {
                 createdByName,
                 vehicleCrews
         );
+    }
+
+    public DepartureCardResponse createCardRevision(Long parentCardId, DepartureCardRequest request, String login) {
+
+        Card parentCard = cardRepository.findById(parentCardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono karty wyjazdu."));
+
+        Firefighter createdBy = firefighterRepository.findByUserLogin(login)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                "Nie znaleziono strażaka dla użytkownika: " + login
+        ));
+
+        City city = cityRepository.findById(request.getCityId())
+                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono miejscowości."));
+
+        Street street = null;
+
+        if (request.getStreetId() != null) {
+            street = streetRepository.findById(request.getStreetId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono ulicy."));
+        }
+
+        Place place = getOrCreatePlace(city, street, createdBy);
+
+        Incident incident = incidentRepository.findById(request.getIncidentId())
+                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono powodu wyjazdu."));
+
+        Long commanderId = request.getCrews()
+                .stream()
+                .filter(crew -> crew.getCommanderId() != null)
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Nie wskazano dowódcy."))
+                .getCommanderId();
+
+        Firefighter commander = firefighterRepository.findById(commanderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono dowódcy."));
+
+        TypeCard typeCard = typeCardRepository.findByName("Karta wyjazdu")
+                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono typu karty: Karta wyjazdu."));
+
+        EmailStatus emailStatus = emailStatusRepository.findByName("Nie wysłano")
+                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono statusu e-mail: Nie wysłano."));
+
+        EmailSend emailSend = emailSendRepository.save(new EmailSend(emailStatus));
+
+        parentCard.deactivate();
+        cardRepository.save(parentCard);
+
+        Card newCard = new Card(
+                request.getDepartureNumber(),
+                LocalDate.parse(request.getDate()),
+                LocalTime.parse(request.getTimeDeparture()),
+                LocalTime.parse(request.getTimeArrival()),
+                request.getDistance(),
+                place,
+                incident,
+                emailSend,
+                commander,
+                typeCard,
+                createdBy,
+                parentCard.getId(),
+                true
+        );
+
+        Card savedCard = cardRepository.save(newCard);
+
+        saveCrews(request, savedCard);
+
+        return new DepartureCardResponse(savedCard.getId(), savedCard.getDepartureNumber(), "Rewizja karty wyjazdu została zapisana.");
     }
 }

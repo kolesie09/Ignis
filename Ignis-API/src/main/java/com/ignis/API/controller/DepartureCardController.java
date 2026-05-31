@@ -48,4 +48,16 @@ public class DepartureCardController {
     public ResponseEntity<DepartureCardDetailsResponse> getCardDetails(@PathVariable Long id) {
         return ResponseEntity.ok(departureCardService.getCardDetails(id));
     }
+
+    @PostMapping("/{id}/revision")
+    public ResponseEntity<DepartureCardResponse> createCardRevision(@PathVariable("id") Long parentCardId, @RequestBody DepartureCardRequest request, Authentication authentication) {
+        // Pobierz login użytkownika z obiektu Authentication
+        String login = authentication.getName();
+        // Wywołaj metodę serwisu, przekazując login użytkownika
+        DepartureCardResponse response = departureCardService.createCardRevision(parentCardId, request, login);
+
+        return ResponseEntity.ok(response);
+
+    }
+
 }

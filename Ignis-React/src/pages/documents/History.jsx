@@ -122,7 +122,9 @@ export default function History() {
                               onClick={() => {
                                 setSelected(r);
                                 setOpenRight(true);
-                                navigate("/documents/history/card/" + r.id);
+                                navigate(
+                                  "/documents/history/card/" + r.id + "/edit",
+                                );
                               }}
                               className="group flex w-full items-center justify-center rounded-md px-2 py-2 text-sm text-gray-900 dark:text-gray-100 data-[focus]:bg-blue-500 data-[focus]:text-white"
                             >

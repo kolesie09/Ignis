@@ -60,6 +60,12 @@ public class Card {
     @JoinColumn(name = "created_by_id", nullable = false)
     private Firefighter createdBy;
 
+    @JoinColumn(name = "parent_card_id")
+    private Long parentCard;
+
+    @JoinColumn(name = "is_active")
+    private Boolean isActive;
+
     public Card() {
     }
 
@@ -74,7 +80,9 @@ public class Card {
             EmailSend emailSend,
             Firefighter commander,
             TypeCard typeCard,
-            Firefighter createdBy
+            Firefighter createdBy,
+            Long parentCard,
+            Boolean isActive
     ) {
         this.departureNumber = departureNumber;
         this.departureDate = departureDate;
@@ -87,6 +95,8 @@ public class Card {
         this.commander = commander;
         this.typeCard = typeCard;
         this.createdBy = createdBy;
+        this.parentCard = parentCard;
+        this.isActive = isActive;
     }
 
     public Long getId() {
@@ -135,6 +145,18 @@ public class Card {
 
     public Firefighter getCreatedBy() {
         return createdBy;
+    }
+
+    public Long getParentCard() {
+        return parentCard;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
     }
 
 }
