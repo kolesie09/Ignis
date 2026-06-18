@@ -16,11 +16,34 @@ const toISODate = (d) => {
   return `${y}-${m}-${day}`;
 };
 
-const emptyCrew = (n) => ({
-  driver: "",
-  commander: "",
-  firefighters: Array(n).fill(""),
-});
+// Helper functions for crew management
+const getFirefighterSlots = (places) => {
+  const placesNumber = Number(places);
+
+  if (!Number.isFinite(placesNumber)) {
+    return 0;
+  }
+
+  return Math.max(placesNumber - 2, 0);
+};
+
+const emptyCrew = (n) => {
+  const count = Number(n);
+
+  if (!Number.isFinite(count)) {
+    return {
+      driver: "",
+      commander: "",
+      firefighters: [],
+    };
+  }
+
+  return {
+    driver: "",
+    commander: "",
+    firefighters: Array(Math.max(count, 0)).fill(""),
+  };
+};
 
 const collectUsed = (crews) => {
   const used = new Set();
@@ -48,6 +71,74 @@ const collectUsed = (crews) => {
   }
 
   return used;
+};
+
+const normalizeText = (value) =>
+  String(value ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+const getCrewMemberId = (member) => {
+  const id = member.firefighterId ?? member.id;
+
+  return id != null ? String(id) : "";
+};
+
+const getCrewMemberFunction = (member) => {
+  return normalizeText(
+    member.functionName ??
+      member.typeFunctionName ??
+      member.roleName ??
+      member.role ??
+      member.function ??
+      "",
+  );
+};
+
+const mapVehicleCrewToFormCrew = (vehicleCrew) => {
+  const crewMembers = vehicleCrew.crew ?? vehicleCrew.firefighters ?? [];
+
+  let driver = "";
+  let commander = "";
+  const firefighters = [];
+
+  crewMembers.forEach((member) => {
+    const firefighterId = getCrewMemberId(member);
+    const functionName = getCrewMemberFunction(member);
+
+    if (!firefighterId) {
+      return;
+    }
+
+    if (functionName.includes("kierowca")) {
+      driver = firefighterId;
+      return;
+    }
+
+    if (functionName.includes("dowodca")) {
+      commander = firefighterId;
+      return;
+    }
+
+    firefighters.push(firefighterId);
+  });
+
+  return {
+    driver,
+    commander,
+    firefighters,
+  };
+};
+
+const getVehicleIdFromCardVehicle = (vehicleCrew) => {
+  const vehicleId =
+    vehicleCrew.vehicleId ??
+    vehicleCrew.garageId ??
+    vehicleCrew.vehicle?.id ??
+    vehicleCrew.garage?.id;
+
+  return vehicleId != null ? String(vehicleId) : "";
 };
 
 export default function CardEdit() {
@@ -84,13 +175,14 @@ export default function CardEdit() {
   const [loadingStreets, setLoadingStreets] = useState(false);
 
   const [distance, setDistance] = useState("");
-  const [distances, setDistances] = useState(() =>
+
+  const [distances, setDistances] = useState(
     Array.from({ length: 20 }, (_, index) => {
-      const value = String(index + 1);
+      const km = index + 1;
 
       return {
-        value,
-        label: `${value} km`,
+        value: String(km),
+        label: `${km} km`,
       };
     }),
   );
@@ -119,6 +211,9 @@ export default function CardEdit() {
   const [distanceModalError, setDistanceModalError] = useState("");
   const [reasonModalError, setReasonModalError] = useState("");
 
+  const [pendingStreetId, setPendingStreetId] = useState("");
+  const [pendingReasonId, setPendingReasonId] = useState("");
+
   const [crews, setCrews] = useState({});
 
   useEffect(() => {
@@ -136,17 +231,68 @@ export default function CardEdit() {
         const data = await response.json();
 
         console.log("KARTA DO EDYCJI:", data);
+        console.log("POJAZDY I ZAŁOGA Z KARTY:", data.vehicles ?? data.vehicle);
 
         setDepartureNumber(String(data.departureNumber ?? ""));
         setDate(data.departureDate ?? "");
-        setTimeDeparture(data.hourDeparture?.slice(0, 5) ?? "");
-        setTimeArrival(data.hourReturn?.slice(0, 5) ?? "");
 
-        setLocation(data.cityId ? String(data.cityId) : "");
-        setStreet(data.streetId ? String(data.streetId) : "");
-        setReason(data.incidentId ? String(data.incidentId) : "");
+        setTimeDeparture(
+          data.hourDeparture ? data.hourDeparture.slice(0, 5) : "",
+        );
+        setTimeArrival(data.hourReturn ? data.hourReturn.slice(0, 5) : "");
 
-        setDistance(data.distance ? String(data.distance) : "");
+        setPendingStreetId(data.streetId != null ? String(data.streetId) : "");
+        setPendingReasonId(
+          data.incidentId != null ? String(data.incidentId) : "",
+        );
+
+        setLocation(data.cityId != null ? String(data.cityId) : "");
+        setCategory(
+          data.incidentTypeId != null ? String(data.incidentTypeId) : "",
+        );
+
+        if (data.trip != null) {
+          const tripValue = String(data.trip);
+
+          setDistances((prev) => {
+            const exists = prev.some((option) => option.value === tripValue);
+
+            if (exists) {
+              return prev;
+            }
+
+            return [
+              ...prev,
+              {
+                value: tripValue,
+                label: `${tripValue} km`,
+              },
+            ].sort((a, b) => Number(a.value) - Number(b.value));
+          });
+
+          setDistance(tripValue);
+        } else {
+          setDistance("");
+        }
+
+        const cardVehicles = data.vehicles ?? data.vehicle ?? [];
+
+        const mappedCrews = cardVehicles.reduce((acc, vehicleCrew) => {
+          const vehicleId = getVehicleIdFromCardVehicle(vehicleCrew);
+
+          if (!vehicleId) {
+            return acc;
+          }
+
+          acc[vehicleId] = mapVehicleCrewToFormCrew(vehicleCrew);
+
+          return acc;
+        }, {});
+
+        setCrews((prev) => ({
+          ...prev,
+          ...mappedCrews,
+        }));
       } catch (error) {
         console.error("Błąd podczas pobierania karty do edycji:", error);
       } finally {
@@ -183,9 +329,22 @@ export default function CardEdit() {
           const updatedCrews = { ...prev };
 
           vehicleOptions.forEach((vehicle) => {
-            if (!updatedCrews[vehicle.id]) {
-              updatedCrews[vehicle.id] = emptyCrew(vehicle.firefightersCount);
+            const firefighterSlots = getFirefighterSlots(vehicle.places);
+            const existingCrew = updatedCrews[vehicle.id];
+
+            if (!existingCrew) {
+              updatedCrews[vehicle.id] = emptyCrew(firefighterSlots);
+              return;
             }
+
+            updatedCrews[vehicle.id] = {
+              driver: existingCrew.driver ?? "",
+              commander: existingCrew.commander ?? "",
+              firefighters: [
+                ...(existingCrew.firefighters ?? []),
+                ...Array(firefighterSlots).fill(""),
+              ].slice(0, firefighterSlots),
+            };
           });
 
           return updatedCrews;
@@ -308,6 +467,8 @@ export default function CardEdit() {
     const fetchStreets = async () => {
       try {
         setLoadingStreets(true);
+        setStreet("");
+        setStreets([]);
 
         const response = await apiFetch(`/api/streets?cityId=${location}`);
 
@@ -324,7 +485,6 @@ export default function CardEdit() {
         }));
 
         setStreets(streetOptions);
-        setStreet("");
       } catch (error) {
         console.error("Błąd pobierania ulic:", error);
       } finally {
@@ -334,6 +494,22 @@ export default function CardEdit() {
 
     fetchStreets();
   }, [location]);
+
+  useEffect(() => {
+    if (!pendingStreetId || streets.length === 0) {
+      return;
+    }
+
+    const streetExists = streets.some(
+      (option) => option.value === pendingStreetId,
+    );
+
+    if (streetExists) {
+      setStreet(pendingStreetId);
+    }
+
+    setPendingStreetId("");
+  }, [pendingStreetId, streets]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -403,6 +579,22 @@ export default function CardEdit() {
 
     fetchReasons();
   }, [category]);
+
+  useEffect(() => {
+    if (!pendingReasonId || reasons.length === 0) {
+      return;
+    }
+
+    const reasonExists = reasons.some(
+      (option) => option.value === pendingReasonId,
+    );
+
+    if (reasonExists) {
+      setReason(pendingReasonId);
+    }
+
+    setPendingReasonId("");
+  }, [pendingReasonId, reasons]);
 
   const handleAddCity = async () => {
     const trimmedCityName = newCityName.trim();
@@ -739,6 +931,7 @@ export default function CardEdit() {
       }));
 
     const departureCardData = {
+      departureNumber: departureNumber ? Number(departureNumber) : null,
       date,
       timeDeparture,
       timeArrival,

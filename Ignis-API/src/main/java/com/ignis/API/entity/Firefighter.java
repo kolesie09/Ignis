@@ -22,14 +22,6 @@ public class Firefighter {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "name")
-    private User name;
-
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "lastname")
-    private User lastname;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "firefighter_status_id", nullable = false)
     private FirefighterStatus firefighterStatus;
@@ -47,14 +39,6 @@ public class Firefighter {
 
     public User getUser() {
         return user;
-    }
-
-    public User getName() {
-        return name;
-    }
-
-    public User getLastname() {
-        return lastname;
     }
 
     public FirefighterStatus getFirefighterStatus() {

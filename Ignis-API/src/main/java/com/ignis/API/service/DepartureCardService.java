@@ -22,6 +22,7 @@ import com.ignis.API.entity.Firefighter;
 import com.ignis.API.entity.FirefighterActionRole;
 import com.ignis.API.entity.Garage;
 import com.ignis.API.entity.Incident;
+import com.ignis.API.entity.IncidentType;
 import com.ignis.API.entity.Place;
 import com.ignis.API.entity.Street;
 import com.ignis.API.entity.TypeCard;
@@ -232,7 +233,7 @@ public class DepartureCardService {
 
     // Metoda do pobierania historii kart wyjazdu
     public List<DepartureCardHistoryResponse> getCardHistory() {
-        List<Card> cards = cardRepository.findAllByOrderByDepartureDateDescReturnTimeDescDepartureTimeDesc();
+        List<Card> cards = cardRepository.findByIsActiveTrueOrderByDepartureDateDescReturnTimeDescDepartureTimeDesc();
 
         return cards.stream().map(card -> {
             String cityName = card.getPlace().getCity().getName();
@@ -272,13 +273,15 @@ public class DepartureCardService {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono karty wyjazdu."));
 
+        City city = card.getPlace().getCity();
+        Street street = card.getPlace().getStreet();
+        Incident incident = card.getIncident();
+        IncidentType incidentType = incident.getIncidentType();
         String cityName = card.getPlace().getCity().getName();
 
         String streetName = card.getPlace().getStreet() != null
                 ? card.getPlace().getStreet().getName()
                 : null;
-
-        String incidentName = card.getIncident().getName();
 
         String commanderName = card.getCommander().getUser().getName()
                 + " "
@@ -321,16 +324,23 @@ public class DepartureCardService {
                 card.getDepartureDate(),
                 card.getDepartureTime(),
                 card.getReturnTime(),
+                city.getId(),
                 cityName,
-                streetName,
-                incidentName,
+                street == null ? null : street.getId(),
+                street == null ? null : street.getName(),
+                incidentType.getId(),
+                incidentType.getName(),
+                incident.getId(),
+                incident.getName(),
                 typeCardName,
                 commanderName,
                 createdByName,
-                vehicleCrews
+                vehicleCrews,
+                card.getTrip()
         );
     }
 
+    // Metoda do tworzenia rewizji karty wyjazdu
     public DepartureCardResponse createCardRevision(Long parentCardId, DepartureCardRequest request, String login) {
 
         Card parentCard = cardRepository.findById(parentCardId)
@@ -356,6 +366,9 @@ public class DepartureCardService {
         Incident incident = incidentRepository.findById(request.getIncidentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono powodu wyjazdu."));
 
+        if (request.getCrews() == null || request.getCrews().isEmpty()) {
+            throw new ResourceNotFoundException("Nie wskazano obsady pojazdu.");
+        }
         Long commanderId = request.getCrews()
                 .stream()
                 .filter(crew -> crew.getCommanderId() != null)
@@ -377,8 +390,12 @@ public class DepartureCardService {
         parentCard.deactivate();
         cardRepository.save(parentCard);
 
+        Integer departureNumber = request.getDepartureNumber() != null
+                ? request.getDepartureNumber()
+                : parentCard.getDepartureNumber();
+
         Card newCard = new Card(
-                request.getDepartureNumber(),
+                departureNumber,
                 LocalDate.parse(request.getDate()),
                 LocalTime.parse(request.getTimeDeparture()),
                 LocalTime.parse(request.getTimeArrival()),
