@@ -233,7 +233,7 @@ public class DepartureCardService {
 
     // Metoda do pobierania historii kart wyjazdu
     public List<DepartureCardHistoryResponse> getCardHistory() {
-        List<Card> cards = cardRepository.findByIsActiveTrueOrderByDepartureDateDescReturnTimeDescDepartureTimeDesc();
+        List<Card> cards = cardRepository.findByIsActiveTrueOrderByDepartureDateDescReturnTimeDescDepartureTimeDescDepartureNumberDesc();
 
         return cards.stream().map(card -> {
             String cityName = card.getPlace().getCity().getName();

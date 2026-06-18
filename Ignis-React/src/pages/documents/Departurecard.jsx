@@ -4,6 +4,7 @@ import DateInput from "../../components/DateInput";
 import SelectInput from "../../components/SelectInput";
 import React, { useMemo, useState, useEffect } from "react";
 import CrewCar from "../../components/DepartureCard/CarCrewCard";
+import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../api/api";
 import AddItemModal from "../../components/AddItemModal";
 
@@ -54,6 +55,8 @@ export default function DepartureCard() {
   const nextYear = new Date(today);
   nextYear.setFullYear(today.getFullYear() + 1);
 
+  const navigate = useNavigate();
+
   const [vehicles, setVehicles] = useState([]);
   const [loadingVehicles, setLoadingVehicles] = useState(false);
 
@@ -63,6 +66,9 @@ export default function DepartureCard() {
   const [departureNumber, setDepartureNumber] = useState("");
 
   const [formErrors, setFormErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState("");
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [savedCardId, setSavedCardId] = useState(null);
 
   const [timeDeparture, setTimeDeparture] = useState("18:30");
   const [timeArrival, setTimeArrival] = useState("18:30");
@@ -727,9 +733,21 @@ export default function DepartureCard() {
 
       const savedCard = await response.json();
 
+      setSavedCardId(savedCard.id);
+      setSuccessMessage("Karta wyjazdu została zapisana pomyślnie.");
+      setSuccessModalOpen(true);
+
       console.log("Zapisano kartę wyjazdu:", savedCard);
     } catch (error) {
       console.error("Błąd zapisu karty wyjazdu:", error);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setSuccessModalOpen(false);
+
+    if (savedCardId) {
+      navigate(`/documents/history/card/${savedCardId}`);
     }
   };
 
@@ -1062,6 +1080,37 @@ export default function DepartureCard() {
         disabled={!category}
         error={reasonModalError}
       />
+
+      {successModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
+                ✓
+              </div>
+
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  Sukces
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {successMessage}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                onClick={handleCloseSuccessModal}
+                className="rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700"
+              >
+                Przejdź do karty
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
