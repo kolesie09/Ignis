@@ -20,6 +20,7 @@ public class FirefighterService {
         this.firefighterRepository = firefighterRepository;
     }
 
+    // Metoda pomocnicza do mapowania encji Firefighter na DTO FirefighterResponse
     private FirefighterResponse mapToResponse(Firefighter firefighter) {
         User user = firefighter.getUser();
 
@@ -42,6 +43,7 @@ public class FirefighterService {
                 nick
         );
     }
+// Metoda pomocnicza do budowania nicku strażaka
 
     private String buildNick(User user, Long firefighterId) {
         if (user == null) {
@@ -68,6 +70,7 @@ public class FirefighterService {
         return "Strażak " + firefighterId;
     }
 
+    // Metoda do pobierania wszystkich strażaków
     public List<FirefighterResponse> getAllFirefighters() {
         return firefighterRepository.findAll()
                 .stream()
@@ -75,6 +78,7 @@ public class FirefighterService {
                 .toList();
     }
 
+    // Metoda do pobierania strażaka po ID
     public FirefighterResponse getFirefighterById(Long id) {
         Firefighter firefighter = firefighterRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka o ID: " + id));
@@ -82,6 +86,7 @@ public class FirefighterService {
         return mapToResponse(firefighter);
     }
 
+    // Metoda do pobierania strażaka na podstawie loginu użytkownika
     public FirefighterResponse getCurrentFirefighter(String login) {
         Firefighter firefighter = firefighterRepository.findByUserLogin(login)
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + login));

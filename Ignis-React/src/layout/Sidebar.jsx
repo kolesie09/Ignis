@@ -88,8 +88,8 @@ export default function Sidebar({ open, onOpenChange }) {
               icon={Archive}
               to={"/"} // Zmieniono z "/home" – jeśli ma prowadzić do głównej prywatnej strony
               subItems={[
-                { label: "Dane osobowe", to: "/myaccount" }, // Zmieniono z "/administration/myaccount"
-                { label: "Karta szkoleń", to: "#billing" },
+                { label: "Dane osobowe", to: "administration/myaccount" }, // Zmieniono z "/administration/myaccount"
+                { label: "Składki", to: "administration/membershipfees" },
                 { label: "Karta ćwiczeń", to: "#invoice" },
                 { label: "Karta kierowcy", to: "#invoice" },
               ]}

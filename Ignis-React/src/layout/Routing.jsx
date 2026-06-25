@@ -8,6 +8,7 @@ import Register from "../pages/auth/Register.jsx";
 import Home from "../pages/Home.jsx";
 import History from "../pages/documents/History.jsx";
 import CardEdit from "../pages/documents/card/CardEdit.jsx";
+import MembershipFees from "../pages/administration/MembershipFees.jsx";
 
 import CardDeparture from "../pages/documents/card/CardDeparture.jsx";
 import CardDetails from "../pages/documents/card/CardDetails.jsx";
@@ -81,8 +82,17 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "myaccount",
-        element: <MyAccount />,
+        path: "administration",
+        children: [
+          {
+            path: "myaccount",
+            element: <MyAccount />,
+          },
+          {
+            path: "membershipfees",
+            element: <MembershipFees />,
+          },
+        ],
       },
     ],
   },

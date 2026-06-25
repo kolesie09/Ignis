@@ -26,11 +26,13 @@ public class StreetController {
         this.streetService = streetService;
     }
 
+    // Endpoint do pobierania ulic w danym mieście
     @GetMapping
     public ResponseEntity<List<StreetResponse>> getStreetsByCity(@RequestParam Long cityId) {
         return ResponseEntity.ok(streetService.getStreetsByCity(cityId));
     }
 
+    // Endpoint do tworzenia nowej ulicy
     @PostMapping
     public ResponseEntity<StreetResponse> createStreet(@RequestBody CreateStreetRequest request, Authentication authentication) {
         String login = authentication.getName();

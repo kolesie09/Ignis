@@ -26,6 +26,7 @@ public class CityService {
         this.firefighterRepository = firefighterRepository;
     }
 
+    // Metoda do pobierania miast dla aktualnego użytkownika
     public List<CityResponse> getCitiesForCurrentUser(String login) {
         Firefighter firefighter = firefighterRepository.findByUserLogin(login)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono strażaka dla użytkownika: " + login));
