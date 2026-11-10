@@ -100,8 +100,8 @@ public class DepartureCardService {
 
         Firefighter createdBy = firefighterRepository.findByUserLogin(login)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                "Nie znaleziono strażaka dla użytkownika: " + login
-        ));
+                        "Nie znaleziono strażaka dla użytkownika: " + login
+                ));
         City city = cityRepository.findById(request.getCityId())
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono miejscowości."));
 
@@ -221,14 +221,14 @@ public class DepartureCardService {
         if (street == null) {
             return placeRepository.findByCityAndStreetIsNull(city)
                     .orElseGet(() -> placeRepository.save(
-                    new Place(city, null, createdBy)
-            ));
+                            new Place(city, null, createdBy)
+                    ));
         }
 
         return placeRepository.findByCityAndStreet(city, street)
                 .orElseGet(() -> placeRepository.save(
-                new Place(city, street, createdBy)
-        ));
+                        new Place(city, street, createdBy)
+                ));
     }
 
     // Metoda do pobierania historii kart wyjazdu
@@ -250,7 +250,7 @@ public class DepartureCardService {
 
             String commanderName = card.getCommander().getUser().getName()
                     + " "
-                    + card.getCommander().getUser().getLastname();
+                    + card.getCommander().getUser().getLastName();
 
             String typeCardName = card.getTypeCard().getName();
 
@@ -285,13 +285,13 @@ public class DepartureCardService {
 
         String commanderName = card.getCommander().getUser().getName()
                 + " "
-                + card.getCommander().getUser().getLastname();
+                + card.getCommander().getUser().getLastName();
 
         String typeCardName = card.getTypeCard().getName();
 
         String createdByName = card.getCreatedBy().getUser().getName()
                 + " "
-                + card.getCreatedBy().getUser().getLastname();
+                + card.getCreatedBy().getUser().getLastName();
 
         List<VehicleCrewResponse> vehicleCrews = vehicleToCardRepository
                 .findByCardId(card.getId())
@@ -301,12 +301,12 @@ public class DepartureCardService {
                             .findByVehicleToCardId(vehicleToCard.getId())
                             .stream()
                             .map(role -> new CrewMemberResponse(
-                            role.getFirefighter().getId(),
-                            role.getFirefighter().getUser().getName()
-                            + " "
-                            + role.getFirefighter().getUser().getLastname(),
-                            role.getTypeFunction().getName()
-                    ))
+                                    role.getFirefighter().getId(),
+                                    role.getFirefighter().getUser().getName()
+                                    + " "
+                                    + role.getFirefighter().getUser().getLastName(),
+                                    role.getTypeFunction().getName()
+                            ))
                             .toList();
 
                     return new VehicleCrewResponse(
@@ -348,8 +348,8 @@ public class DepartureCardService {
 
         Firefighter createdBy = firefighterRepository.findByUserLogin(login)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                "Nie znaleziono strażaka dla użytkownika: " + login
-        ));
+                        "Nie znaleziono strażaka dla użytkownika: " + login
+                ));
 
         City city = cityRepository.findById(request.getCityId())
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono miejscowości."));

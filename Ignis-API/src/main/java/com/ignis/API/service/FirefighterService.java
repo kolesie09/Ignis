@@ -35,7 +35,7 @@ public class FirefighterService {
                 firefighter.getId(),
                 user.getLogin(),
                 user.getName(),
-                user.getLastname(),
+                user.getLastName(),
                 user.getEmail(),
                 firefighter.getFirefighterStatus().getName(),
                 firefighter.getFireStation().getName(),
@@ -55,13 +55,13 @@ public class FirefighterService {
         }
 
         String firstName = user.getName() == null ? "" : user.getName();
-        String lastname = user.getLastname() == null ? "" : user.getLastname();
+        String lastName = user.getLastName() == null ? "" : user.getLastName();
 
-        if (!firstName.isBlank() && !lastname.isBlank()) {
-            return lastname + " " + firstName.charAt(0);
+        if (!firstName.isBlank() && !lastName.isBlank()) {
+            return lastName + " " + firstName.charAt(0);
         }
 
-        String fullName = (firstName + " " + lastname).trim();
+        String fullName = (firstName + " " + lastName).trim();
 
         if (!fullName.isBlank()) {
             return fullName;

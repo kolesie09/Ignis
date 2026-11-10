@@ -28,7 +28,7 @@ function Login({ setRegistered, handleRegister }) {
       if (response.ok) {
         const data = await response.json();
 
-        login(data.token);
+        login(data.token, data.roles);
         navigate("/");
       } else {
         setError("Błędny login lub hasło");

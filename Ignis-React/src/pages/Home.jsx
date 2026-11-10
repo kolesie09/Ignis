@@ -64,6 +64,30 @@ export default function Home({ setSelected, setOpenRight }) {
         </Button>
       </div>
 
+      <Card>
+        <CardBody className="p-0 text-white">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
+            <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-4 hover:bg-zinc-100 dark:hover:bg-zinc-900 cursor-pointer">
+              <p className="text-center">WYDARZENIE</p>
+              <p>Miejsce: Boczna 4</p>
+              <p>Data: 2025-01-01</p>
+              <p>Uczestnicy: 10</p>
+              <p>Zapisani: 5</p>
+              <p>
+                Opis: <br />
+                To jest opis wydarzenia.
+              </p>
+              <Button
+                className="flex mt-2 w-full items-center justify-center hover:bg-indigo-700 hover:text-white"
+                variant="primary"
+              >
+                Zapisz się
+              </Button>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       {/* Table */}
       <Card>
         <CardBody className="overflow-x-auto p-0">

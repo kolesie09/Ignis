@@ -17,12 +17,25 @@ public class FireStation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(
+            name = "name",
+            nullable = false,
+            unique = true
+    )
     private String name;
 
     @Column(name = "year_of_establishment")
-    private LocalDate yearOfEstablishment;
+    private LocalDate establishmentDate;
 
-    public FireStation() {
+    protected FireStation() {
+    }
+
+    public FireStation(
+            String name,
+            LocalDate establishmentDate
+    ) {
+        this.name = name;
+        this.establishmentDate = establishmentDate;
     }
 
     public Long getId() {
@@ -33,7 +46,7 @@ public class FireStation {
         return name;
     }
 
-    public LocalDate getYearOfEstablishment() {
-        return yearOfEstablishment;
+    public LocalDate getEstablishmentDate() {
+        return establishmentDate;
     }
 }

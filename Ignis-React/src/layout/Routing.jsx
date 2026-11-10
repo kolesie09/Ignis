@@ -9,6 +9,9 @@ import Home from "../pages/Home.jsx";
 import History from "../pages/documents/History.jsx";
 import CardEdit from "../pages/documents/card/CardEdit.jsx";
 import MembershipFees from "../pages/administration/MembershipFees.jsx";
+import Settings from "../pages/settings/Settings.jsx";
+import { RequireRole } from "../context/RequireRole.jsx";
+import FireStations from "../pages/settings/FireStations.jsx";
 
 import CardDeparture from "../pages/documents/card/CardDeparture.jsx";
 import CardDetails from "../pages/documents/card/CardDetails.jsx";
@@ -94,6 +97,46 @@ export const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "settings",
+        element: (
+          <RequireRole allowedRoles={["ROLE_ADMIN"]}>
+            <Settings />
+          </RequireRole>
+        ),
+      },
+      {
+        path: "settings/fire-stations",
+        element: (
+          <RequireRole allowedRoles={["ROLE_ADMIN"]}>
+            <FireStations />
+          </RequireRole>
+        ),
+      },
+      /* {
+        path: "settings/users/add",
+        element: (
+          <RequireRole allowedRoles={["ROLE_ADMIN"]}>
+            <UserAdd />
+          </RequireRole>
+        ),
+      },
+      {
+        path: "settings/users",
+        element: (
+          <RequireRole allowedRoles={["ROLE_ADMIN"]}>
+            <UsersManagement />
+          </RequireRole>
+        ),
+      },
+      {
+        path: "settings/roles",
+        element: (
+          <RequireRole allowedRoles={["ROLE_ADMIN"]}>
+            <RolesManagement />
+          </RequireRole>
+        ),
+      }, */
     ],
   },
 ]);

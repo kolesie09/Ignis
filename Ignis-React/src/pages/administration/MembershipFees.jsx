@@ -34,7 +34,6 @@ export default function MembershipFees() {
 
       <h1 className="text-2xl font-bold mb-4">Składki członkowskie</h1>
       <p>
-        Tu będzie zawartość dotycząca składek członkowskich.
         {membershipFees.map((r, idx) => (
           <div key={idx}>
             <p>Rok: {r.year}</p>

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -30,7 +31,8 @@ public class User {
     private String password;
     private String email;
     private String name;
-    private String lastname;
+    @Column(name = "lastname")
+    private String lastName;
     private LocalDate dateOfBirth;
     private String nick;
 

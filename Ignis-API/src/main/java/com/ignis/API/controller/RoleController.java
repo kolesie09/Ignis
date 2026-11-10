@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ignis.API.entity.Roles;
+import com.ignis.API.entity.Role;
 import com.ignis.API.service.RoleService;
 
 @RestController
@@ -21,8 +21,8 @@ public class RoleController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Roles>> getAllRoles() {
-        List<Roles> roles = rolesService.getAllRoles();
+    public ResponseEntity<List<Role>> getAllRoles() {
+        List<Role> roles = rolesService.getAllRoles();
         return ResponseEntity.ok(roles);
     }
 

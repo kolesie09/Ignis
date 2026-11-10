@@ -34,31 +34,31 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(request -> {
-            var corsConfiguration = new CorsConfiguration();
+                    var corsConfiguration = new CorsConfiguration();
 
-            corsConfiguration.setAllowedOriginPatterns(
-                    Arrays.stream(allowedOriginPatterns.split(","))
-                            .map(String::trim)
-                            .toList()
-            );
+                    corsConfiguration.setAllowedOriginPatterns(
+                            Arrays.stream(allowedOriginPatterns.split(","))
+                                    .map(String::trim)
+                                    .toList()
+                    );
 
-            corsConfiguration.setAllowedMethods(List.of(
-                    "GET", "POST", "PUT", "DELETE", "OPTIONS"
-            ));
+                    corsConfiguration.setAllowedMethods(List.of(
+                            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+                    ));
 
-            corsConfiguration.setAllowedHeaders(List.of("*"));
-            corsConfiguration.setAllowCredentials(true);
+                    corsConfiguration.setAllowedHeaders(List.of("*"));
+                    corsConfiguration.setAllowCredentials(true);
 
-            return corsConfiguration;
-        }))
+                    return corsConfiguration;
+                }))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/login", "/api/users").permitAll()
-                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                .anyRequest().authenticated()
+                        .requestMatchers("/api/users/login").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -1,5 +1,6 @@
 import React from "react";
 import SidebarItem from "../components/SidebarItem";
+import { useAuth } from "../context/AuthContext.jsx";
 // (opcjonalnie ikony)
 import {
   Home,
@@ -8,9 +9,11 @@ import {
   Mail,
   ChartNoAxesCombined,
   Archive,
+  Settings,
 } from "lucide-react";
 
 export default function Sidebar({ open, onOpenChange }) {
+  const { roles, hasRole, hasAnyRole } = useAuth();
   // Zamknij ESC
   React.useEffect(() => {
     function onKey(e) {
@@ -88,7 +91,14 @@ export default function Sidebar({ open, onOpenChange }) {
               icon={Archive}
               to={"/"} // Zmieniono z "/home" – jeśli ma prowadzić do głównej prywatnej strony
               subItems={[
-                { label: "Dane osobowe", to: "administration/myaccount" }, // Zmieniono z "/administration/myaccount"
+                ...(hasAnyRole(["ROLE_F"])
+                  ? [
+                      {
+                        label: "Dane osobowe",
+                        to: "/administration/myaccount",
+                      },
+                    ]
+                  : []), // Zmieniono z "/administration/myaccount"
                 { label: "Składki", to: "administration/membershipfees" },
                 { label: "Karta ćwiczeń", to: "#invoice" },
                 { label: "Karta kierowcy", to: "#invoice" },
@@ -114,12 +124,14 @@ export default function Sidebar({ open, onOpenChange }) {
               onNavigate={() => onOpenChange(false)}
             />
 
-            <SidebarItem
-              label="Messages"
-              icon={Mail}
-              href="#messages"
-              onNavigate={() => onOpenChange(false)}
-            />
+            {hasRole("ROLE_ADMIN") && (
+              <SidebarItem
+                label="Ustawienia"
+                icon={Settings}
+                to="/settings"
+                onNavigate={() => onOpenChange(false)}
+              />
+            )}
           </ul>
 
           {/* Dolna sekcja */}

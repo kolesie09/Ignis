@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ignis.API.dto.request.LoginRequest;
 import com.ignis.API.dto.response.LoginResponse;
-import com.ignis.API.entity.User;
 import com.ignis.API.service.UserService;
+import com.ignis.API.dto.request.CreateUserRequest;
+import com.ignis.API.dto.response.CreateUserResponse;
 
 @CrossOrigin(origins = "${app.cors.allowed-origin-patterns}")
 @RestController
@@ -28,20 +29,27 @@ public class UserController {
 
     // Ta adnotacja oznacza, że metoda reaguje na żądania typu POST (tworzenie)
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        // @RequestBody automatycznie tłumaczy JSON z Reacta na obiekt User w Javie
-        return userService.createUser(user);
+    @PreAuthorize("hasRole('ADMIN')") // Tylko użytkownicy z rolą ADMIN mogą tworzyć nowych użytkowników
+    public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest request) {
+        CreateUserResponse response = userService.createUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        String token = userService.login(loginRequest.getLogin(), loginRequest.getPassword());
 
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Błędny login lub hasło");
+        LoginResponse loginResponse = userService.login(
+                loginRequest.getLogin(),
+                loginRequest.getPassword()
+        );
+
+        if (loginResponse == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Błędny login lub hasło");
         }
 
-        return ResponseEntity.ok(new LoginResponse(token));
+        return ResponseEntity.ok(loginResponse);
     }
 
     @GetMapping("/test")
