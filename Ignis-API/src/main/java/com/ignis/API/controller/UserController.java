@@ -36,18 +36,12 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
 
         LoginResponse loginResponse = userService.login(
                 loginRequest.getLogin(),
                 loginRequest.getPassword()
         );
-
-        if (loginResponse == null) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Błędny login lub hasło");
-        }
 
         return ResponseEntity.ok(loginResponse);
     }

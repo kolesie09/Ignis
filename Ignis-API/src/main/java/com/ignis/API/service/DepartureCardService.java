@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ignis.API.dto.request.DepartureCardRequest;
 import com.ignis.API.dto.request.VehicleCrewRequest;
@@ -341,10 +343,15 @@ public class DepartureCardService {
     }
 
     // Metoda do tworzenia rewizji karty wyjazdu
+    @Transactional
     public DepartureCardResponse createCardRevision(Long parentCardId, DepartureCardRequest request, String login) {
 
         Card parentCard = cardRepository.findById(parentCardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono karty wyjazdu."));
+
+        if (!parentCard.getIsActive()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ta karta została już poprawiona. Odśwież stronę i edytuj aktualną wersję.");
+        }
 
         Firefighter createdBy = firefighterRepository.findByUserLogin(login)
                 .orElseThrow(() -> new ResourceNotFoundException(

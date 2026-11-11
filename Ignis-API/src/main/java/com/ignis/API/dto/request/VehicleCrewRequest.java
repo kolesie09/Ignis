@@ -2,8 +2,11 @@ package com.ignis.API.dto.request;
 
 import java.util.List;
 
+import jakarta.validation.constraints.NotNull;
+
 public class VehicleCrewRequest {
 
+    @NotNull(message = "Pojazd jest wymagany")
     private Long vehicleId;
     private Long driverId;
     private Long commanderId;

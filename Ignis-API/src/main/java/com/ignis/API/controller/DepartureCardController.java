@@ -17,6 +17,8 @@ import com.ignis.API.dto.response.DepartureCardHistoryResponse;
 import com.ignis.API.dto.response.DepartureCardResponse;
 import com.ignis.API.service.DepartureCardService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/departure-cards")
 public class DepartureCardController {
@@ -29,6 +31,7 @@ public class DepartureCardController {
 
     @PostMapping
     public ResponseEntity<DepartureCardResponse> createDepartureCard(
+            @Valid
             @RequestBody DepartureCardRequest request,
             Authentication authentication
     ) {
@@ -50,7 +53,7 @@ public class DepartureCardController {
     }
 
     @PostMapping("/{id}/revision")
-    public ResponseEntity<DepartureCardResponse> createCardRevision(@PathVariable("id") Long parentCardId, @RequestBody DepartureCardRequest request, Authentication authentication) {
+    public ResponseEntity<DepartureCardResponse> createCardRevision(@PathVariable("id") Long parentCardId, @Valid @RequestBody DepartureCardRequest request, Authentication authentication) {
         // Pobierz login użytkownika z obiektu Authentication
         String login = authentication.getName();
         // Wywołaj metodę serwisu, przekazując login użytkownika

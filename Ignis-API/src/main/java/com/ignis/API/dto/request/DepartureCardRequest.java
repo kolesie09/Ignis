@@ -2,16 +2,42 @@ package com.ignis.API.dto.request;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+
 public class DepartureCardRequest {
 
+    @NotNull(message = "Numer wyjazdu jest wymagany")
     private Integer departureNumber;
+
+    @NotBlank(message = "Data wyjazdu jest wymagana")
     private String date;
+
+    @NotBlank(message = "Godzina wyjazdu jest wymagana")
     private String timeDeparture;
+
+    @NotBlank(message = "Godzina powrotu jest wymagana")
     private String timeArrival;
+
+    @NotNull(message = "Miejscowość jest wymagana")
     private Long cityId;
+
+    // Ulica jest opcjonalna — serwis obsługuje null
     private Long streetId;
+
+    @NotNull(message = "Liczba kilometrów jest wymagana")
+    @PositiveOrZero(message = "Liczba kilometrów nie może być ujemna")
     private Integer distance;
+
+    @NotNull(message = "Powód wyjazdu jest wymagany")
     private Long incidentId;
+
+    // @Valid sprawia, że walidowany jest też każdy element listy (VehicleCrewRequest)
+    @NotEmpty(message = "Wymagany jest co najmniej jeden pojazd z obsadą")
+    @Valid
     private List<VehicleCrewRequest> crews;
 
     public Integer getDepartureNumber() {

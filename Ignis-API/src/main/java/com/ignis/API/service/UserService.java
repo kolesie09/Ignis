@@ -18,6 +18,7 @@ import com.ignis.API.repository.RoleRepository;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+import com.ignis.API.exception.InvalidCredentialsException;
 import com.ignis.API.exception.ResourceNotFoundException;
 
 @Service
@@ -27,6 +28,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RoleRepository roleRepository;
+    private static final String INVALID_CREDENTIALS = "Nieprawidłowe dane logowania!";
 
     // Spring automatycznie "wstrzyknie" tutaj nasze repozytorium
     public UserService(UserRepository userRepository, JwtService jwtService, RoleRepository roleRepository) {
@@ -90,10 +92,11 @@ public class UserService {
 
     public LoginResponse login(String login, String password) {
 
-        User user = getUserByLogin(login);
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new InvalidCredentialsException(INVALID_CREDENTIALS));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            return null;
+            throw new InvalidCredentialsException(INVALID_CREDENTIALS);
         }
 
         List<String> roles = user.getRoles()

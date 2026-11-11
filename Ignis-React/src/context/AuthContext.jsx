@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext(null);
 
@@ -37,6 +37,18 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setRoles([]);
   };
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      logout();
+    };
+
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+
+    return () => {
+      window.removeEventListener("auth:unauthorized", handleUnauthorized);
+    };
+  }, []);
 
   const hasRole = (requiredRole) => {
     return roles.includes(requiredRole);
