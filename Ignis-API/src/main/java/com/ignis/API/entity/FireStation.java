@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,6 +28,10 @@ public class FireStation {
 
     @Column(name = "year_of_establishment")
     private LocalDate establishmentDate;
+
+    @ManyToOne
+    @JoinColumn(name = "municipality_id")
+    private Municipality municipality;
 
     protected FireStation() {
     }
@@ -49,4 +55,9 @@ public class FireStation {
     public LocalDate getEstablishmentDate() {
         return establishmentDate;
     }
+
+    public Municipality getMunicipality() {
+        return municipality;
+    }
+
 }
