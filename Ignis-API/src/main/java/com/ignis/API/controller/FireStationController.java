@@ -39,7 +39,7 @@ public class FireStationController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<FireStationResponse> createFireStation(
             @Valid
             @RequestBody CreateFireStationRequest request

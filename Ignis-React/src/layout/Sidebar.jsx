@@ -124,7 +124,7 @@ export default function Sidebar({ open, onOpenChange }) {
               onNavigate={() => onOpenChange(false)}
             />
 
-            {hasRole("ROLE_ADMIN") && (
+            {hasRole("ROLE_SUPER_ADMIN") && (
               <SidebarItem
                 label="Ustawienia"
                 icon={Settings}

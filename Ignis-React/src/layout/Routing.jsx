@@ -100,7 +100,7 @@ export const router = createBrowserRouter([
       {
         path: "settings",
         element: (
-          <RequireRole allowedRoles={["ROLE_ADMIN"]}>
+          <RequireRole allowedRoles={["ROLE_ADMIN", "ROLE_SUPER_ADMIN"]}>
             <Settings />
           </RequireRole>
         ),
@@ -108,7 +108,7 @@ export const router = createBrowserRouter([
       {
         path: "settings/fire-stations",
         element: (
-          <RequireRole allowedRoles={["ROLE_ADMIN"]}>
+          <RequireRole allowedRoles={["ROLE_ADMIN", "ROLE_SUPER_ADMIN"]}>
             <FireStations />
           </RequireRole>
         ),
