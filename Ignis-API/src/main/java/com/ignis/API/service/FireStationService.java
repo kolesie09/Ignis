@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.ignis.API.dto.request.CreateFireStationRequest;
 import com.ignis.API.dto.response.FireStationResponse;
+import com.ignis.API.dto.response.MunicipalityResponse;
 import com.ignis.API.entity.FireStation;
 import com.ignis.API.entity.Municipality;
 import com.ignis.API.repository.FireStationRepository;
@@ -39,9 +40,9 @@ public class FireStationService {
     // Zwraca wszystkie jednostki posortowane alfabetycznie po nazwie.
     public List<FireStationResponse> getAllFireStations() {
         return fireStationRepository
-                .findAllByOrderByNameAsc()   // Spring generuje zapytanie SQL z samej nazwy metody
-                .stream()                    // zamiana listy na strumień, żeby móc ją przekształcić
-                .map(this::mapToResponse)    // każdą encję FireStation zamieniamy na DTO
+                .findAllByOrderByNameAsc() // Spring generuje zapytanie SQL z samej nazwy metody
+                .stream() // zamiana listy na strumień, żeby móc ją przekształcić
+                .map(this::mapToResponse) // każdą encję FireStation zamieniamy na DTO
                 .toList();                   // z powrotem do listy
     }
 
@@ -99,7 +100,11 @@ public class FireStationService {
         return new FireStationResponse(
                 fireStation.getId(),
                 fireStation.getName(),
-                fireStation.getEstablishmentDate()
+                fireStation.getEstablishmentDate(),
+                new MunicipalityResponse(
+                        fireStation.getMunicipality().getId(),
+                         fireStation.getMunicipality().getName()
+                )
         );
     }
 }

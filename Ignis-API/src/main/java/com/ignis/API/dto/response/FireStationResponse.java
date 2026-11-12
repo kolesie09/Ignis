@@ -5,7 +5,8 @@ import java.time.LocalDate;
 public record FireStationResponse(
         Long id,
         String name,
-        LocalDate establishmentDate
+        LocalDate establishmentDate,
+        MunicipalityResponse municipality
         ) {
 
 }

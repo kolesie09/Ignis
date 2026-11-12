@@ -30,7 +30,7 @@ public class FireStation {
     private LocalDate establishmentDate;
 
     @ManyToOne
-    @JoinColumn(name = "municipality_id")
+    @JoinColumn(name = "municipality_id", nullable = false)
     private Municipality municipality;
 
     protected FireStation() {
