@@ -103,7 +103,7 @@ public class FireStationService {
                 fireStation.getEstablishmentDate(),
                 new MunicipalityResponse(
                         fireStation.getMunicipality().getId(),
-                         fireStation.getMunicipality().getName()
+                        fireStation.getMunicipality().getName()
                 )
         );
     }

@@ -4,447 +4,168 @@ import { ArrowLeft, Building2, Plus } from "lucide-react";
 
 import { apiFetch } from "../../api/api.js";
 
-/*
-  Początkowy stan formularza.
-
-  Trzymamy go w osobnej stałej, ponieważ używamy go:
-  1. przy pierwszym uruchomieniu komponentu,
-  2. po poprawnym dodaniu jednostki, aby wyczyścić formularz.
-*/
+// Pusty formularz – używany na starcie i do wyczyszczenia pól po zapisie.
+// Wszystkie wartości to "" (a nie null), bo pola są kontrolowane przez React.
 const initialForm = {
   name: "",
   establishmentDate: "",
+  municipalityId: "",
 };
 
+// Strona "Ustawienia → Jednostki OSP": formularz dodawania + lista jednostek.
 export default function FireStations() {
-  /*
-    Lista jednostek pobrana z backendu.
-
-    Początkowo jest pusta:
-    []
-  */
+  // --- Dane z backendu ---
   const [fireStations, setFireStations] = useState([]);
+  const [municipalities, setMunicipalities] = useState([]); // do listy rozwijanej
 
-  /*
-    Dane aktualnie wpisane w formularzu.
-
-    Przykładowy stan:
-    {
-      name: "OSP Barlinek",
-      establishmentDate: "1945-05-12"
-    }
-  */
+  // --- Stan formularza ---
   const [form, setForm] = useState(initialForm);
 
-  /*
-    loading informuje, czy trwa pobieranie listy jednostek.
-
-    Dzięki temu zamiast pustej strony możemy wyświetlić:
-    "Pobieranie jednostek..."
-  */
-  const [loading, setLoading] = useState(true);
-
-  /*
-    saving informuje, czy trwa zapisywanie nowej jednostki.
-
-    Używamy go między innymi do:
-    - zablokowania przycisku,
-    - zmiany napisu na "Dodawanie...".
-  */
-  const [saving, setSaving] = useState(false);
-
-  /*
-    error przechowuje komunikat błędu.
-
-    Gdy jest pustym tekstem:
-    ""
-
-    komunikat nie zostaje wyświetlony.
-  */
+  // --- Stan interfejsu ---
+  const [loading, setLoading] = useState(true); // ładowanie listy jednostek
+  const [saving, setSaving] = useState(false); // trwa wysyłanie formularza
   const [error, setError] = useState("");
-
-  /*
-    success przechowuje komunikat sukcesu po dodaniu jednostki.
-  */
   const [success, setSuccess] = useState("");
 
-  /*
-    useEffect uruchamia się po pierwszym wyświetleniu komponentu.
-
-    Pusta tablica zależności:
-    []
-
-    oznacza, że efekt wykona się tylko raz, po wejściu na stronę.
-  */
+  // Pusta tablica zależności [] = uruchom tylko raz, po wejściu na stronę.
+  // Oba zapytania lecą równolegle – każde zarządza tylko swoim stanem.
   useEffect(() => {
     loadFireStations();
+    loadMunicipalities();
   }, []);
 
-  /*
-    Funkcja pobierająca wszystkie jednostki z backendu.
-  */
-  const loadFireStations = async () => {
+  // GET /api/municipalities – lista gmin do wyboru w formularzu.
+  const loadMunicipalities = async () => {
     try {
-      /*
-        Rozpoczynamy pobieranie danych.
-      */
-      setLoading(true);
-
-      /*
-        Czyścimy poprzedni komunikat błędu.
-      */
       setError("");
 
-      /*
-        Wysyłamy request:
+      const response = await apiFetch("/api/municipalities");
 
-        GET /api/fire-stations
+      if (!response.ok) {
+        throw new Error("Nie udało się pobrać gmin");
+      }
 
-        apiFetch powinien automatycznie dołączyć token użytkownika.
-      */
+      const data = await response.json();
+      setMunicipalities(data);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  // GET /api/fire-stations – lista jednostek (z gminą w środku).
+  const loadFireStations = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      // apiFetch sam dokleja token JWT do nagłówka Authorization.
       const response = await apiFetch("/api/fire-stations");
 
-      /*
-        response.ok jest równe true dla odpowiedzi HTTP 200–299.
-
-        Przykładowo:
-        200 OK       → true
-        201 Created  → true
-        400          → false
-        403          → false
-        500          → false
-      */
+      // response.ok === true tylko dla statusów 200–299.
       if (!response.ok) {
         throw new Error("Nie udało się pobrać jednostek");
       }
 
-      /*
-        Zamieniamy odpowiedź JSON na dane JavaScript.
-
-        Backend powinien zwrócić tablicę:
-
-        [
-          {
-            id: 1,
-            name: "OSP Barlinek",
-            establishmentDate: "1945-05-12"
-          }
-        ]
-      */
       const data = await response.json();
-
-      /*
-        Zapisujemy pobrane jednostki w stanie komponentu.
-
-        Zmiana stanu powoduje ponowne renderowanie komponentu.
-      */
       setFireStations(data);
     } catch (error) {
-      /*
-        Ten fragment wykonuje się, gdy wystąpi błąd.
-
-        error.message zawiera tekst przekazany do:
-
-        throw new Error("...")
-      */
       setError(error.message);
     } finally {
-      /*
-        finally wykonuje się zawsze:
-        - po sukcesie,
-        - po błędzie.
-
-        Kończymy więc stan ładowania.
-      */
+      // finally wykona się zawsze – po sukcesie i po błędzie.
       setLoading(false);
     }
   };
 
-  /*
-    Jedna funkcja obsługująca zmianę wszystkich pól formularza.
-
-    Dla inputa:
-    name="name"
-
-    zmieni:
-    form.name
-
-    Dla inputa:
-    name="establishmentDate"
-
-    zmieni:
-    form.establishmentDate
-  */
+  // Jedna funkcja dla wszystkich pól formularza.
+  // Atrybut name pola (np. "municipalityId") wskazuje, który klucz w form zmienić.
   const handleChange = (event) => {
-    /*
-      event.target oznacza element formularza,
-      który właśnie został zmieniony.
-
-      Przykładowo dla nazwy:
-
-      name  = "name"
-      value = "OSP Barlinek"
-    */
     const { name, value } = event.target;
 
-    /*
-      currentForm to poprzednia wartość formularza.
-
-      Operator:
-      ...currentForm
-
-      kopiuje wszystkie dotychczasowe pola.
-
-      Zapis:
-      [name]: value
-
-      oznacza dynamiczny wybór pola.
-
-      Gdy name === "name", JavaScript wykona:
-
-      name: value
-
-      Gdy name === "establishmentDate", wykona:
-
-      establishmentDate: value
-    */
+    // ...currentForm kopiuje stare pola, [name]: value nadpisuje jedno z nich.
     setForm((currentForm) => ({
       ...currentForm,
       [name]: value,
     }));
   };
 
-  /*
-    Funkcja próbuje odczytać komunikat błędu zwrócony przez backend.
-
-    Backend może zwrócić na przykład:
-
-    {
-      "message": "Jednostka już istnieje"
-    }
-
-    albo:
-
-    {
-      "detail": "Jednostka już istnieje"
-    }
-  */
+  // Wyciąga komunikat błędu z odpowiedzi backendu.
+  // .catch(() => null) – gdy odpowiedź nie jest JSON-em, nie wysypujemy się.
+  // ?? bierze pierwszą wartość, która nie jest null/undefined.
   const readErrorMessage = async (response) => {
-    /*
-      response.json() może zakończyć się błędem,
-      jeżeli backend zwróci zwykły tekst albo pustą odpowiedź.
-
-      Dlatego używamy:
-      .catch(() => null)
-    */
     const data = await response.json().catch(() => null);
 
-    /*
-      Operator ?? wybiera pierwszą wartość,
-      która nie jest null ani undefined.
-
-      Kolejność:
-      1. data.message
-      2. data.detail
-      3. nasz domyślny komunikat
-    */
     return data?.message ?? data?.detail ?? "Nie udało się dodać jednostki";
   };
 
-  /*
-    Funkcja wykonywana po wysłaniu formularza.
-  */
+  // POST /api/fire-stations – dodanie nowej jednostki.
   const handleSubmit = async (event) => {
-    /*
-      Domyślnie formularz HTML przeładowuje stronę.
-
-      preventDefault() zatrzymuje to zachowanie,
-      dzięki czemu request obsługujemy w React.
-    */
+    // Bez tego przeglądarka przeładowałaby stronę.
     event.preventDefault();
 
-    /*
-      Czyścimy stare komunikaty.
-    */
     setError("");
     setSuccess("");
 
-    /*
-      trim() usuwa spacje z początku i końca tekstu.
-
-      Przykład:
-
-      "  OSP Barlinek  "
-
-      po trim():
-
-      "OSP Barlinek"
-    */
     const normalizedName = form.name.trim();
 
-    /*
-      Dodatkowa walidacja po stronie frontendu.
-
-      HTML ma również required, ale warto sprawdzić dane
-      przed wysłaniem requestu.
-    */
+    // Szybka walidacja na froncie (backend i tak sprawdza to samo).
     if (!normalizedName) {
       setError("Nazwa jednostki jest wymagana");
       return;
     }
 
     try {
-      /*
-        Informujemy interfejs, że trwa zapis.
-      */
       setSaving(true);
 
-      /*
-        Wysyłamy request:
-
-        POST /api/fire-stations
-      */
       const response = await apiFetch("/api/fire-stations", {
         method: "POST",
-
-        /*
-          JSON.stringify zamienia obiekt JavaScript na tekst JSON.
-
-          Obiekt:
-
-          {
-            name: "OSP Barlinek"
-          }
-
-          zostanie wysłany jako:
-
-          {
-            "name": "OSP Barlinek"
-          }
-        */
         body: JSON.stringify({
           name: normalizedName,
-
-          /*
-            Gdy data została wybrana, wysyłamy ją.
-
-            Gdy pole jest puste, wysyłamy null.
-          */
+          // Puste pole daty -> null (data jest opcjonalna).
           establishmentDate: form.establishmentDate || null,
+          // <select> zwraca tekst ("1") -> zamieniamy na liczbę.
+          // Pusty wybór: Number("") = 0, a 0 || null = null -> backend zwróci 400.
+          municipalityId: Number(form.municipalityId) || null,
         }),
       });
 
-      /*
-        Gdy backend zwróci błąd, próbujemy odczytać
-        dokładny komunikat.
-      */
       if (!response.ok) {
         const message = await readErrorMessage(response);
-
-        /*
-          Rzucenie błędu powoduje przejście do catch.
-        */
         throw new Error(message);
       }
 
-      /*
-        Backend zwraca utworzoną jednostkę,
-        razem z ID wygenerowanym przez bazę.
-
-        Przykład:
-
-        {
-          id: 4,
-          name: "OSP Barlinek",
-          establishmentDate: "1945-05-12"
-        }
-      */
       const createdFireStation = await response.json();
 
-      /*
-        Dodajemy nową jednostkę do aktualnej listy.
-
-        Nie musimy ponownie pobierać całej listy z backendu,
-        ponieważ backend zwrócił utworzony rekord.
-      */
+      // Dopisujemy nową jednostkę lokalnie zamiast pobierać całą listę od nowa.
+      // Tworzymy NOWĄ tablicę (React wykrywa zmianę po nowej referencji)
+      // i sortujemy po polsku, tak jak sortuje backend.
       setFireStations((currentStations) =>
-        /*
-          Tworzymy nową tablicę:
-
-          [
-            ...stare jednostki,
-            nowa jednostka
-          ]
-        */
         [...currentStations, createdFireStation].sort(
-          /*
-            Sortujemy jednostki alfabetycznie po nazwie.
-
-            localeCompare(..., "pl")
-            uwzględnia polskie zasady sortowania.
-          */
           (firstStation, secondStation) =>
             firstStation.name.localeCompare(secondStation.name, "pl"),
         ),
       );
 
-      /*
-        Czyścimy formularz po poprawnym zapisie.
-      */
       setForm(initialForm);
-
-      /*
-        Pokazujemy użytkownikowi komunikat sukcesu.
-      */
       setSuccess(`Dodano jednostkę ${createdFireStation.name}.`);
     } catch (error) {
-      /*
-        Obsługujemy błędy:
-        - backendu,
-        - sieci,
-        - odczytu danych.
-      */
       setError(error.message);
     } finally {
-      /*
-        Niezależnie od wyniku kończymy stan zapisywania.
-      */
       setSaving(false);
     }
   };
 
-  /*
-    Funkcja formatująca datę do polskiego formatu.
-
-    Backend zwraca:
-    1945-05-12
-
-    Użytkownik zobaczy:
-    12.05.1945
-  */
+  // "1945-05-12" -> "12.05.1945".
+  // T00:00:00 wymusza czas lokalny – bez tego data mogłaby się przesunąć o dzień.
   const formatDate = (date) => {
-    /*
-      Jeżeli data nie została podana, pokazujemy komunikat.
-    */
     if (!date) {
       return "Brak danych";
     }
 
-    /*
-      Dodajemy T00:00:00, aby JavaScript potraktował datę
-      jako lokalną północ.
-
-      Bez tego w niektórych strefach czasowych data
-      mogłaby przesunąć się o jeden dzień.
-    */
     return new Date(`${date}T00:00:00`).toLocaleDateString("pl-PL");
   };
 
   return (
     <main className="mx-auto w-full max-w-6xl p-4 md:p-8">
-      {/*
-        Link powrotny do głównej strony ustawień.
-      */}
       <Link
         to="/settings"
         className="
@@ -457,9 +178,7 @@ export default function FireStations() {
         Wróć do ustawień
       </Link>
 
-      {/*
-        Nagłówek strony.
-      */}
+      {/* ===== Nagłówek strony ===== */}
       <header className="mb-8 flex items-center gap-4">
         <div
           className="
@@ -479,14 +198,7 @@ export default function FireStations() {
         </div>
       </header>
 
-      {/*
-        Warunkowe renderowanie błędu.
-
-        Jeżeli error jest pusty:
-        ""
-
-        ten fragment nie zostanie wyświetlony.
-      */}
+      {/* ===== Komunikaty (renderowane tylko gdy tekst nie jest pusty) ===== */}
       {error && (
         <div
           className="
@@ -498,9 +210,6 @@ export default function FireStations() {
         </div>
       )}
 
-      {/*
-        Warunkowe renderowanie komunikatu sukcesu.
-      */}
       {success && (
         <div
           className="
@@ -512,19 +221,9 @@ export default function FireStations() {
         </div>
       )}
 
-      {/*
-        Układ dwóch kolumn.
-
-        Na dużych ekranach:
-        - lewa kolumna ma 380px,
-        - prawa zajmuje pozostałe miejsce.
-
-        Na małych ekranach elementy układają się jeden pod drugim.
-      */}
+      {/* Dwie kolumny na dużym ekranie (380px + reszta), jedna pod drugą na telefonie */}
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-        {/*
-          Lewa kolumna — formularz dodawania jednostki.
-        */}
+        {/* ===== Lewa kolumna: formularz ===== */}
         <section
           className="
             h-fit rounded-xl border border-slate-200
@@ -539,11 +238,9 @@ export default function FireStations() {
             </h2>
           </div>
 
-          {/*
-            onSubmit uruchamia handleSubmit po kliknięciu przycisku
-            albo po naciśnięciu Enter.
-          */}
+          {/* onSubmit łapie zarówno kliknięcie przycisku, jak i Enter */}
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Nazwa – pole kontrolowane: wartość z form.name, zmiany przez handleChange */}
             <label className="block">
               <span
                 className="
@@ -554,15 +251,6 @@ export default function FireStations() {
                 Nazwa jednostki
               </span>
 
-              {/*
-                Jest to kontrolowany input.
-
-                React przechowuje jego wartość w:
-                form.name
-
-                Każda zmiana uruchamia:
-                handleChange
-              */}
               <input
                 type="text"
                 name="name"
@@ -580,6 +268,7 @@ export default function FireStations() {
               />
             </label>
 
+            {/* Data założenia – opcjonalna; max blokuje daty z przyszłości */}
             <label className="block">
               <span
                 className="
@@ -595,12 +284,6 @@ export default function FireStations() {
                 name="establishmentDate"
                 value={form.establishmentDate}
                 onChange={handleChange}
-                /*
-                  max ustawia dzisiejszą datę jako maksymalną.
-
-                  Dzięki temu użytkownik nie może wybrać
-                  przyszłej daty założenia.
-                */
                 max={new Date().toISOString().split("T")[0]}
                 className="
                   w-full rounded-lg border border-slate-300
@@ -615,13 +298,41 @@ export default function FireStations() {
               </p>
             </label>
 
+            {/* Gmina – opcje z /api/municipalities; value="" oznacza "nic nie wybrano" */}
+            <label className="block">
+              <span
+                className="
+                  mb-2 block text-sm font-medium
+                  text-slate-700
+                "
+              >
+                Gmina
+              </span>
+
+              <select
+                name="municipalityId"
+                value={form.municipalityId}
+                onChange={handleChange}
+                required
+                className="
+                  w-full rounded-lg border border-slate-300
+                  px-3 py-2.5 outline-none transition
+                  focus:border-red-500
+                  focus:ring-2 focus:ring-red-100
+                "
+              >
+                <option value="">Wybierz gminę</option>
+                {municipalities.map((municipality) => (
+                  <option key={municipality.id} value={municipality.id}>
+                    {municipality.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {/* disabled podczas zapisu – chroni przed podwójnym wysłaniem */}
             <button
               type="submit"
-              /*
-                Podczas zapisywania blokujemy przycisk.
-
-                Zapobiega to wysłaniu formularza kilka razy.
-              */
               disabled={saving}
               className="
                 inline-flex w-full items-center
@@ -634,18 +345,12 @@ export default function FireStations() {
               "
             >
               <Plus size={19} />
-
-              {/*
-                Warunkowo zmieniamy tekst przycisku.
-              */}
               {saving ? "Dodawanie..." : "Dodaj jednostkę"}
             </button>
           </form>
         </section>
 
-        {/*
-          Prawa kolumna — lista istniejących jednostek.
-        */}
+        {/* ===== Prawa kolumna: lista jednostek ===== */}
         <section
           className="
             overflow-hidden rounded-xl
@@ -663,13 +368,7 @@ export default function FireStations() {
             </p>
           </div>
 
-          {/*
-            Renderujemy jeden z trzech stanów:
-
-            1. trwa ładowanie,
-            2. lista jest pusta,
-            3. lista zawiera jednostki.
-          */}
+          {/* Trzy stany: ładowanie → pusta lista → lista z danymi */}
           {loading ? (
             <div className="p-8 text-center text-slate-500">
               Pobieranie jednostek...
@@ -685,18 +384,9 @@ export default function FireStations() {
               </p>
             </div>
           ) : (
-            /*
-              Gdy mamy jednostki, mapujemy tablicę.
-
-              Dla każdego elementu tworzymy osobny <article>.
-            */
             <div className="divide-y divide-slate-200">
               {fireStations.map((station) => (
-                /*
-                  key pomaga Reactowi rozpoznawać elementy listy.
-
-                  Najlepiej używać stabilnego, unikalnego ID z bazy.
-                */
+                // key = stabilne ID z bazy, żeby React rozpoznawał elementy listy
                 <article
                   key={station.id}
                   className="
@@ -719,6 +409,14 @@ export default function FireStations() {
                     <h3 className="font-semibold text-slate-900">
                       {station.name}
                     </h3>
+
+                    {/* Gmina przychodzi z backendu jako obiekt { id, name } */}
+                    <h4 className="mt-1 text-sm text-slate-500">
+                      Gmina:{" "}
+                      {station.municipality
+                        ? station.municipality.name
+                        : "Brak danych"}
+                    </h4>
 
                     <p className="mt-1 text-sm text-slate-500">
                       Data założenia: {formatDate(station.establishmentDate)}
