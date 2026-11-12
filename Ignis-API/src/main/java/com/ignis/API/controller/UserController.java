@@ -42,7 +42,6 @@ public class UserController {
                 loginRequest.getLogin(),
                 loginRequest.getPassword()
         );
-
         return ResponseEntity.ok(loginResponse);
     }
 

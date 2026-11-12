@@ -38,10 +38,12 @@ public class FireStation {
 
     public FireStation(
             String name,
-            LocalDate establishmentDate
+            LocalDate establishmentDate,
+            Municipality municipality
     ) {
         this.name = name;
         this.establishmentDate = establishmentDate;
+        this.municipality = municipality;
     }
 
     public Long getId() {
