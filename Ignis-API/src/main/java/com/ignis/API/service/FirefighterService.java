@@ -5,19 +5,23 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.ignis.API.dto.response.FirefighterResponse;
+import com.ignis.API.entity.FireStation;
 import com.ignis.API.entity.Firefighter;
 import com.ignis.API.entity.Role;
 import com.ignis.API.entity.User;
 import com.ignis.API.exception.ResourceNotFoundException;
+import com.ignis.API.repository.FireStationRepository;
 import com.ignis.API.repository.FirefighterRepository;
 
 @Service
 public class FirefighterService {
 
     private final FirefighterRepository firefighterRepository;
+    private final FireStationRepository fireStationRepository;
 
-    public FirefighterService(FirefighterRepository firefighterRepository) {
+    public FirefighterService(FirefighterRepository firefighterRepository, FireStationRepository fireStationRepository) {
         this.firefighterRepository = firefighterRepository;
+        this.fireStationRepository = fireStationRepository;
     }
 
     // Metoda pomocnicza do mapowania encji Firefighter na DTO FirefighterResponse
@@ -92,5 +96,18 @@ public class FirefighterService {
                 .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + login));
 
         return mapToResponse(firefighter);
+    }
+
+    // Metoda do pobierania strażaków przypisanych do jednostki OSP
+    public List<FirefighterResponse> getFirefightersFromMyStation(String login) {
+        Firefighter currentFirefighter = firefighterRepository.findByUserLogin(login)
+                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + login));
+
+        Long fireStationId = currentFirefighter.getFireStation().getId();
+
+        return firefighterRepository.findByFireStationId(fireStationId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 }

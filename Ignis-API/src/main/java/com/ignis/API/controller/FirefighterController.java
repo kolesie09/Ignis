@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ignis.API.dto.response.FirefighterResponse;
 import com.ignis.API.service.FirefighterService;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/firefighters")
@@ -23,8 +24,9 @@ public class FirefighterController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FirefighterResponse>> getAllFirefighters() {
-        return ResponseEntity.ok(firefighterService.getAllFirefighters());
+    public ResponseEntity<List<FirefighterResponse>> getAllFirefighters(Authentication authentication) {
+        String login = authentication.getName();
+        return ResponseEntity.ok(firefighterService.getFirefightersFromMyStation(login));
     }
 
     @GetMapping("/{id}")

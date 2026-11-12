@@ -30,7 +30,17 @@ public class Firefighter {
     @JoinColumn(name = "fire_station_id", nullable = false)
     private FireStation fireStation;
 
-    public Firefighter() {
+    protected Firefighter() {
+    }
+
+    public Firefighter(
+            User user,
+            FirefighterStatus firefighterStatus,
+            FireStation fireStation
+    ) {
+        this.user = user;
+        this.firefighterStatus = firefighterStatus;
+        this.fireStation = fireStation;
     }
 
     public Long getId() {

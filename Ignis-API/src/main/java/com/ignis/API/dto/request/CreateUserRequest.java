@@ -23,33 +23,8 @@ public class CreateUserRequest {
 
     private String nick;
 
-
-    /*
-     * Identyfikatory ról wybranych w formularzu.
-     *
-     * Przykład:
-     * [1, 3]
-     *
-     * Może to oznaczać:
-     * ROLE_MEMBER oraz ROLE_TREASURER.
-     */
     private Set<Long> roleIds;
 
-    /*
-     * Identyfikator jednostki OSP.
-     *
-     * Przykład:
-     * 1 → OSP Barlinek
-     */
-    private Long fireStationId;
-
-    /*
-     * Identyfikator statusu strażaka.
-     *
-     * Przykład:
-     * 1 → czynny
-     * 2 → wspierający
-     */
     private Long firefighterStatusId;
 
 }
