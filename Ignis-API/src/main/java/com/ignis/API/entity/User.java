@@ -36,6 +36,23 @@ public class User {
     private LocalDate dateOfBirth;
     private String nick;
 
+    @Column(name = "active", nullable = false)
+    private boolean active;
+
+    protected User() {
+    }
+
+    public User(String login, String password, String email, String name, String lastName, LocalDate dateOfBirth, String nick) {
+        this.login = login;
+        this.password = password;
+        this.email = email;
+        this.name = name;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.nick = nick;
+        this.active = false; // Domyślnie ustawiamy na false
+    }
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
@@ -46,6 +63,14 @@ public class User {
 
     public Set<Role> getRoles() {
         return roles;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void activate() {
+        this.active = true;
     }
 
     // Tutaj później wygenerujesz gettery i settery

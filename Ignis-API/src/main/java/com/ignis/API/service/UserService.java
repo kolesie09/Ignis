@@ -82,15 +82,17 @@ public class UserService {
         }
 
         // 3.Ustawiamy zahashowane hasło w obiekcie user
-        User user = new User();
-        user.setLogin(request.getLogin());
-        user.setEmail(request.getEmail());
-        user.setPassword(encodedPassword);
-        user.setName(request.getName());
-        user.setLastName(request.getLastName());
-        user.setDateOfBirth(request.getDateOfBirth());
-        user.setNick(request.getNick());
+        User user = new User(
+                request.getLogin(),
+                encodedPassword,
+                request.getEmail(),
+                request.getName(),
+                request.getLastName(),
+                request.getDateOfBirth(),
+                request.getNick()
+        );
         user.setRoles(new HashSet<>(roles));
+        user.activate();
 
         FirefighterStatus firefighterStatus = firefighterStatusRepository.findById(request.getFirefighterStatusId())
                 .orElseThrow(() -> new ResponseStatusException(
@@ -126,6 +128,10 @@ public class UserService {
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new InvalidCredentialsException(INVALID_CREDENTIALS);
+        }
+
+        if (!user.isActive()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Konto użytkownika czeka na akceptację administratora.");
         }
 
         List<String> roles = user.getRoles()

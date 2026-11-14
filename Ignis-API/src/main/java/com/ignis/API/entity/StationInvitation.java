@@ -23,7 +23,7 @@ public class StationInvitation {
     private String token;
 
     @ManyToOne
-    @JoinColumn(name = "fire_station", nullable = false)
+    @JoinColumn(name = "fire_station_id", nullable = false)
     private FireStation fireStation;
 
     @ManyToOne
