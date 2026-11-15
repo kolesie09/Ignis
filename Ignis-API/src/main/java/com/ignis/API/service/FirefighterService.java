@@ -110,4 +110,17 @@ public class FirefighterService {
                 .map(this::mapToResponse)
                 .toList();
     }
+
+    public List<FirefighterResponse> getPendingFirefightersFromMyStation(String login) {
+
+        Firefighter currentFirefighter = firefighterRepository.findByUserLogin(login)
+                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + login));
+
+        Long fireStationId = currentFirefighter.getFireStation().getId();
+
+        return firefighterRepository.findByFireStationIdAndUserActiveFalse(fireStationId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
 }

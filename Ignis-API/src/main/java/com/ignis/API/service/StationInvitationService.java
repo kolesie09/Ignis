@@ -31,7 +31,7 @@ public class StationInvitationService {
     }
 
     @Transactional
-    public String createInvitation(int validDays) {
+    public String createInvitation(String login, int validDays) {
 
         if (validDays <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Liczba dni ważności musi być większa od zera.");

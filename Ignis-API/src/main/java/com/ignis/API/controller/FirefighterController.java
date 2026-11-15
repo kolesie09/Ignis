@@ -3,6 +3,7 @@ package com.ignis.API.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ignis.API.dto.response.FirefighterResponse;
 import com.ignis.API.service.FirefighterService;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/firefighters")
@@ -38,6 +38,12 @@ public class FirefighterController {
     public ResponseEntity<FirefighterResponse> getCurrentFirefighter(Authentication authentication) {
         String login = authentication.getName();
         return ResponseEntity.ok(firefighterService.getCurrentFirefighter(login));
+    }
+
+    @GetMapping("/pending")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<FirefighterResponse>> getPendingFirefighters(Authentication authentication) {
+        return ResponseEntity.ok(firefighterService.getPendingFirefightersFromMyStation(authentication.getName()));
     }
 
 }

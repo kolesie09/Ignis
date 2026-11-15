@@ -16,4 +16,6 @@ public interface FirefighterRepository extends JpaRepository<Firefighter, Long> 
 
     boolean existsByFireStationIdAndUserNick(Long fireStationId, String nick);
 
+    List<Firefighter> findByFireStationIdAndUserActiveFalse(Long fireStationId);
+
 }
