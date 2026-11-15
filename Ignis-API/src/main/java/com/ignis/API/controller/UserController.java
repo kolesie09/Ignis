@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ignis.API.dto.request.LoginRequest;
 import com.ignis.API.dto.response.LoginResponse;
 import com.ignis.API.service.UserService;
+
+import jakarta.validation.Valid;
+
 import com.ignis.API.dto.request.CreateUserRequest;
 import com.ignis.API.dto.response.CreateUserResponse;
 
@@ -32,7 +34,7 @@ public class UserController {
     // Ta adnotacja oznacza, że metoda reaguje na żądania typu POST (tworzenie)
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')") // Tylko użytkownicy z rolą ADMIN mogą tworzyć nowych użytkowników
-    public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest request, Authentication authentication) {
+    public ResponseEntity<CreateUserResponse> createUser(@Valid @RequestBody CreateUserRequest request, Authentication authentication) {
         CreateUserResponse response = userService.createUser(request, authentication.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

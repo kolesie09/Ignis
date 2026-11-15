@@ -49,7 +49,7 @@ public class User {
         this.name = name;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
-        this.nick = nick;
+        this.nick = (nick == null || nick.isBlank()) ? generateNick(name, lastName) : nick;
         this.active = false; // Domyślnie ustawiamy na false
     }
 
@@ -73,5 +73,10 @@ public class User {
         this.active = true;
     }
 
-    // Tutaj później wygenerujesz gettery i settery
+    private static String generateNick(String name, String lastName) {
+
+        return lastName + " " + name.charAt(0);
+
+    }
+
 }

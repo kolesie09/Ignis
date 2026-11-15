@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ignis.API.dto.request.RegisterByInvitationRequest;
 import com.ignis.API.entity.Firefighter;
 import com.ignis.API.entity.StationInvitation;
 import com.ignis.API.repository.FirefighterRepository;
@@ -19,14 +21,17 @@ public class StationInvitationService {
 
     private final StationInvitationRepository stationInvitationRepository;
     private final FirefighterRepository firefighterRepository;
+    private final UserService userService;
 
-    public StationInvitationService(StationInvitationRepository stationInvitationRepository, FirefighterRepository firefighterRepository) {
+    public StationInvitationService(StationInvitationRepository stationInvitationRepository, FirefighterRepository firefighterRepository, UserService userService) {
         this.stationInvitationRepository = stationInvitationRepository;
         this.firefighterRepository = firefighterRepository;
+        this.userService = userService;
+
     }
 
     @Transactional
-    public String createInvitation(String login, int validDays) {
+    public String createInvitation(int validDays) {
 
         if (validDays <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Liczba dni ważności musi być większa od zera.");
@@ -45,6 +50,22 @@ public class StationInvitationService {
 
             return token;
         }
+
+    }
+
+    @Transactional
+    public void registerByInvitation(RegisterByInvitationRequest request) {
+        StationInvitation invitation = stationInvitationRepository.findByToken(request.token())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono zaproszenia"));
+
+        if (invitation.isRevoked()) {
+            throw new ResponseStatusException(HttpStatus.GONE, "Zaproszenie zostało unieważnione");
+        }
+        if (invitation.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.GONE, "Zaproszenie wygasło");
+        }
+
+        userService.registerPendingUser(request, invitation.getFireStation());
 
     }
 }

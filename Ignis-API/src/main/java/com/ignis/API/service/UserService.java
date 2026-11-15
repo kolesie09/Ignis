@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ignis.API.dto.request.RegisterByInvitationRequest;
 import com.ignis.API.exception.InvalidCredentialsException;
 import com.ignis.API.exception.ResourceNotFoundException;
 
@@ -143,4 +144,45 @@ public class UserService {
 
         return new LoginResponse(token, roles);
     }
+
+    @Transactional
+    public void registerPendingUser(RegisterByInvitationRequest request, FireStation fireStation) {
+        if (userRepository.existsByLogin(request.login())) {
+            throw new DuplicateResourceException("Login jest już zajęty!");
+        }
+
+        if (userRepository.existsByEmail(request.email())) {
+            throw new DuplicateResourceException("Email jest już zajęty!");
+        }
+
+        String encodedPassword = passwordEncoder.encode(request.password());
+
+        User user = new User(request.login(), encodedPassword, request.email(), request.name(), request.lastName(), null, null);
+
+        user.setNick(makeNickUniqueInStation(user.getNick(), fireStation.getId()));
+
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new IllegalStateException("Brak roli ROLE_USER w bazie"));
+        user.getRoles().add(userRole);
+
+        User savedUser = userRepository.save(user);
+
+        FirefighterStatus status = firefighterStatusRepository.findByName("Kandydat")
+                .orElseThrow(() -> new IllegalStateException("Brak statusu Kandydat w bazie"));
+
+        firefighterRepository.save(new Firefighter(savedUser, status, fireStation));
+
+    }
+
+    private String makeNickUniqueInStation(String baseNick, Long fireStationId) {
+        String candidate = baseNick;
+        int counter = 2;
+        while (firefighterRepository.existsByFireStationIdAndUserNick(fireStationId, candidate)) {
+            candidate = baseNick + " " + counter;
+            counter++;
+        }
+
+        return candidate;
+    }
+
 }

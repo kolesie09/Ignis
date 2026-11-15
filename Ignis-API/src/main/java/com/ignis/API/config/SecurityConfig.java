@@ -63,7 +63,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/login").permitAll() //Dodawnie wyjątku dla endpointu logowania
+                        .requestMatchers("/api/users/login", "/api/station-invitations/register").permitAll() //Dodawnie wyjątku dla endpointu logowania
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )
