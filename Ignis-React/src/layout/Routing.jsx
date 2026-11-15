@@ -18,6 +18,7 @@ import CardDetails from "../pages/documents/card/CardDetails.jsx";
 import CardDepartureUser from "../pages/documents/card/CardDepartureUser.jsx";
 import { RequireAuth } from "../context/RequireAuth.jsx";
 import Firefighters from "../pages/firefighters/Firefighters.jsx";
+import Invitations from "../pages/settings/Invitations.jsx";
 
 export const router = createBrowserRouter([
   // Strony publiczne
@@ -110,6 +111,14 @@ export const router = createBrowserRouter([
         element: (
           <RequireRole allowedRoles={["ROLE_ADMIN", "ROLE_SUPER_ADMIN"]}>
             <FireStations />
+          </RequireRole>
+        ),
+      },
+      {
+        path: "settings/invitation",
+        element: (
+          <RequireRole allowedRoles={["ROLE_ADMIN", "ROLE_SUPER_ADMIN"]}>
+            <Invitations />
           </RequireRole>
         ),
       },

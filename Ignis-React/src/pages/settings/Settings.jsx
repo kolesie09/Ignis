@@ -32,6 +32,12 @@ const settingsItems = [
     icon: Building2,
     to: "/settings/fire-stations",
   },
+  {
+    title: "Zaproszenia",
+    description: "Generowanie zaproszenia dla nowych członków OSP",
+    icon: UserPlus,
+    to: "/settings/invitation",
+  },
 ];
 
 function SettingsCard({ title, description, icon: Icon, to }) {
