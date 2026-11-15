@@ -3,28 +3,36 @@ package com.ignis.API.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 
 import com.ignis.API.dto.response.FirefighterResponse;
-import com.ignis.API.entity.FireStation;
 import com.ignis.API.entity.Firefighter;
+import com.ignis.API.entity.FirefighterStatus;
 import com.ignis.API.entity.Role;
 import com.ignis.API.entity.User;
 import com.ignis.API.exception.ResourceNotFoundException;
 import com.ignis.API.repository.FireStationRepository;
 import com.ignis.API.repository.FirefighterRepository;
+import com.ignis.API.repository.FirefighterStatusRepository;
+import com.ignis.API.repository.UserRepository;
 
 @Service
 public class FirefighterService {
 
     private final FirefighterRepository firefighterRepository;
     private final FireStationRepository fireStationRepository;
+    private final FirefighterStatusRepository firefighterStatusRepository;
 
-    public FirefighterService(FirefighterRepository firefighterRepository, FireStationRepository fireStationRepository) {
+    public FirefighterService(FirefighterRepository firefighterRepository, FireStationRepository fireStationRepository, FirefighterStatusRepository firefighterStatusRepository) {
         this.firefighterRepository = firefighterRepository;
         this.fireStationRepository = fireStationRepository;
+        this.firefighterStatusRepository = firefighterStatusRepository;
     }
-
     // Metoda pomocnicza do mapowania encji Firefighter na DTO FirefighterResponse
+
     private FirefighterResponse mapToResponse(Firefighter firefighter) {
         User user = firefighter.getUser();
 
@@ -122,5 +130,33 @@ public class FirefighterService {
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    @Transactional
+    public void approveFirefighter(Long firefighterId, Long statusId, String adminLogin) {
+        Firefighter adminFirefighter = firefighterRepository.findByUserLogin(adminLogin)
+                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + adminLogin));
+
+        Long adminStation = adminFirefighter.getFireStation().getId();
+
+        Firefighter candidatFirefighter = firefighterRepository.findById(firefighterId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono kandydata"));
+
+        if (!candidatFirefighter.getFireStation().getId().equals(adminStation)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono kandydata");
+        }
+
+        if (candidatFirefighter.getUser().isActive()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Strażak jest już aktywny");
+        }
+
+        candidatFirefighter.getUser().activate();
+
+        if (statusId != null) {
+            FirefighterStatus firefighterStatus = firefighterStatusRepository.findById(statusId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono statusu"));
+
+            candidatFirefighter.changeStatus(firefighterStatus);
+        }
     }
 }

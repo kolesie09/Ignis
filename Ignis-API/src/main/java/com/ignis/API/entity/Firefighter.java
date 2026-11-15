@@ -58,4 +58,8 @@ public class Firefighter {
     public FireStation getFireStation() {
         return fireStation;
     }
+
+    public void changeStatus(FirefighterStatus firefighterStatus) {
+        this.firefighterStatus = firefighterStatus;
+    }
 }

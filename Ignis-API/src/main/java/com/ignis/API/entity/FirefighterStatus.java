@@ -26,4 +26,5 @@ public class FirefighterStatus {
     public String getName() {
         return name;
     }
+
 }

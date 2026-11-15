@@ -6,10 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ignis.API.dto.request.ApproveFirefighterRequest;
 import com.ignis.API.dto.response.FirefighterResponse;
 import com.ignis.API.service.FirefighterService;
 
@@ -21,6 +24,7 @@ public class FirefighterController {
 
     public FirefighterController(FirefighterService firefighterService) {
         this.firefighterService = firefighterService;
+
     }
 
     @GetMapping
@@ -44,6 +48,14 @@ public class FirefighterController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<FirefighterResponse>> getPendingFirefighters(Authentication authentication) {
         return ResponseEntity.ok(firefighterService.getPendingFirefightersFromMyStation(authentication.getName()));
+    }
+
+    @PatchMapping("/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> patchApproveCandidat(@PathVariable Long id, @RequestBody(required = false) ApproveFirefighterRequest request, Authentication authentication) {
+        Long statusId = (request != null) ? request.firefighterStatusId() : null;
+        firefighterService.approveFirefighter(id, statusId, authentication.getName());
+        return ResponseEntity.noContent().build();
     }
 
 }
