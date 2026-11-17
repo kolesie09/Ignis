@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, UserPlus, Plus } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
 import { apiFetch } from "../../api/api.js";
 export default function Invitations() {
@@ -11,6 +12,8 @@ export default function Invitations() {
   const [saving, setSaving] = useState(false);
   const [token, setToken] = useState("");
   const dayOptions = [1, 7, 14, 30];
+
+  const inviteLink = `${window.location.origin}/register?token=${token}`;
 
   // Wyciąga komunikat błędu z odpowiedzi backendu.
   // .catch(() => null) – gdy odpowiedź nie jest JSON-em, nie wysypujemy się.
@@ -170,7 +173,12 @@ export default function Invitations() {
               {saving ? "Generowanie..." : "Wygeneruj link"}
             </button>
           </form>
-          {token && <div className=" break-all">{token}</div>}
+          {token && (
+            <div className="break-all">
+              {inviteLink}
+              <QRCodeSVG value={inviteLink} />
+            </div>
+          )}
         </div>
       </section>
     </main>
