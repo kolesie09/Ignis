@@ -13,6 +13,8 @@ export default function Invitations() {
   const [token, setToken] = useState("");
   const dayOptions = [1, 7, 14, 30];
 
+  const [copyStatus, setCopyStatus] = useState("");
+
   const inviteLink = `${window.location.origin}/register?token=${token}`;
 
   // Wyciąga komunikat błędu z odpowiedzi backendu.
@@ -22,6 +24,20 @@ export default function Invitations() {
     const data = await response.text().catch(() => null);
 
     return data || "Nie udało się wygenerować linku";
+  };
+
+  const handleClose = () => {
+    setToken("");
+    setCopyStatus("");
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      setCopyStatus("copied");
+    } catch {
+      setCopyStatus("error");
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -186,6 +202,17 @@ export default function Invitations() {
                 <p className="mb-4 break-all rounded-lg bg-slate-100 p-3 text-sm text-slate-700">
                   {inviteLink}
                 </p>
+                {copyStatus === "copied" ? (
+                  <h4 className="flex justify-center font-medium text-green-700">
+                    Skopiowano!
+                  </h4>
+                ) : copyStatus === "error" ? (
+                  <h4 className="flex justify-center font-medium text-red-700">
+                    Nie udało się skopiować linku
+                  </h4>
+                ) : (
+                  ""
+                )}
 
                 {/* QR: białe tło + padding = margines, którego potrzebują skanery */}
                 <div className="mb-6 flex justify-center">
@@ -196,7 +223,15 @@ export default function Invitations() {
 
                 <button
                   type="button"
-                  onClick={() => setToken("")}
+                  onClick={handleCopy}
+                  className="w-full rounded-lg bg-red-600 px-4 py-2.5 font-medium text-white transition hover:bg-red-700 mb-2.5"
+                >
+                  Kopiuj link
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleClose}
                   className="w-full rounded-lg bg-red-600 px-4 py-2.5 font-medium text-white transition hover:bg-red-700"
                 >
                   Zamknij
