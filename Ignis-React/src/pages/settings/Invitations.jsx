@@ -114,7 +114,7 @@ export default function Invitations() {
             bg-white p-6 shadow-sm
           "
       >
-        <div className="grid gap-6 lg:grid-cols-[380px_lfr]">
+        <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
           <div className="mb-5 flex items-center gap-3">
             <Plus size={21} className="text-red-600" />
 
@@ -174,9 +174,34 @@ export default function Invitations() {
             </button>
           </form>
           {token && (
-            <div className="break-all">
-              {inviteLink}
-              <QRCodeSVG value={inviteLink} />
+            // Warstwa 1: tło na cały ekran, przyciemnione, wyśrodkowuje okienko
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+              {/* Warstwa 2: okienko */}
+              <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-lg">
+                <h2 className="mb-4 text-lg font-semibold text-slate-900">
+                  Link zaproszenia
+                </h2>
+
+                {/* break-all: długi link łamie się w dowolnym miejscu zamiast wychodzić poza okno */}
+                <p className="mb-4 break-all rounded-lg bg-slate-100 p-3 text-sm text-slate-700">
+                  {inviteLink}
+                </p>
+
+                {/* QR: białe tło + padding = margines, którego potrzebują skanery */}
+                <div className="mb-6 flex justify-center">
+                  <div className="rounded-lg bg-white p-3">
+                    <QRCodeSVG value={inviteLink} size={200} />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setToken("")}
+                  className="w-full rounded-lg bg-red-600 px-4 py-2.5 font-medium text-white transition hover:bg-red-700"
+                >
+                  Zamknij
+                </button>
+              </div>
             </div>
           )}
         </div>
