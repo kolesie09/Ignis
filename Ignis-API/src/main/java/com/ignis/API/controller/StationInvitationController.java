@@ -17,14 +17,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ignis.API.dto.request.RegisterByInvitationRequest;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import com.ignis.API.service.InvitationPosterService;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
+
+
+
 @RestController
 @RequestMapping("/api/station-invitations")
 public class StationInvitationController {
 
     private final StationInvitationService stationInvitationService;
+    private final InvitationPosterService invitationPosterService;
 
-    public StationInvitationController(StationInvitationService stationInvitationService) {
+    public StationInvitationController(StationInvitationService stationInvitationService, InvitationPosterService invitationPosterService) {
         this.stationInvitationService = stationInvitationService;
+        this.invitationPosterService = invitationPosterService;
     }
 
     @PostMapping("/generate")
@@ -40,5 +51,20 @@ public class StationInvitationController {
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @GetMapping("/{token}/poster")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<byte[]> poster(@PathVariable String token, Authentication authentication) {
+
+        byte[] pdf = invitationPosterService.generatePoster(token, authentication.getName());
+        
+
+        return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_PDF)
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"zaproszenie.pdf\"")
+        .body(pdf);
+        
+    }
+    
 
 }
