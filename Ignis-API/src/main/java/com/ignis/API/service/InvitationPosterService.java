@@ -23,7 +23,10 @@ import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfWriter;
 
 import com.google.zxing.WriterException;
+
 import java.io.IOException;
+
+import com.lowagie.text.Image;
 
 @Service
 public class InvitationPosterService {
@@ -62,12 +65,32 @@ public class InvitationPosterService {
         try {
             document.open();
 
-            BaseFont baseFont = BaseFont.createFont("fonts/DejaVuSans-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            Font titleFont = new Font(baseFont, 36);
+            BaseFont baseFont = BaseFont.createFont("fonts/DejaVuSans.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            Font titleFont = new Font(baseFont, 30);
 
-            Paragraph title = new Paragraph("IGNIS", titleFont);
+            Image logo = Image.getInstance(getClass().getResource("/images/Ignis.png"));
+
+            logo.scaleToFit(120, 120);
+
+            logo.setAlignment(Element.ALIGN_CENTER);
+            document.add(logo);
+
+            Paragraph title = new Paragraph("Zeskanuj kod QR i zarejestruj się! ", titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingBefore(10);
+            title.setSpacingAfter(10);
             document.add(title);
+
+            Image qrCode = Image.getInstance(qr);
+            qrCode.setAlignment(Element.ALIGN_CENTER);
+            qrCode.scaleAbsolute(250, 250);
+            document.add(qrCode);
+
+            Paragraph fireStationParagraph = new Paragraph("Jednostka " + invitation.getFireStation().getName(), new Font(baseFont, 18));
+            fireStationParagraph.setAlignment(Element.ALIGN_CENTER);
+            fireStationParagraph.setSpacingBefore(20);
+
+            document.add(fireStationParagraph);
             document.close();
 
         } catch (IOException e) {
