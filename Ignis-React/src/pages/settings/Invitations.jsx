@@ -10,6 +10,10 @@ export default function Invitations() {
   const [pendingFirefighters, setPendingFirefighters] = useState([]);
   const [loadingPending, setLoadingPending] = useState(true);
 
+  const [statuses, setStatuses] = useState([]);
+  const [approvingFirefighter, setApprovingFirefighter] = useState(null);
+  const [selectedStatusId, setSelectedStatusId] = useState("");
+
   const [validDays, setValidDays] = useState("7");
   const [saving, setSaving] = useState(false);
   const [token, setToken] = useState("");
@@ -21,6 +25,7 @@ export default function Invitations() {
 
   useEffect(() => {
     loadingPendingFirefighters();
+    loadStatuses();
   }, []);
 
   // Wyciąga komunikat błędu z odpowiedzi backendu.
@@ -35,6 +40,11 @@ export default function Invitations() {
   const handleClose = () => {
     setToken("");
     setCopyStatus("");
+  };
+
+  const handleCloseApprove = () => {
+    setApprovingFirefighter(null);
+    setSelectedStatusId("");
   };
 
   const loadingPendingFirefighters = async () => {
@@ -71,19 +81,34 @@ export default function Invitations() {
     }
   };
 
-  const handleApprove = async (firefighterId) => {
+  const handleApprove = async (event) => {
+    event.preventDefault();
     setError("");
     setSuccess("");
 
     try {
       const response = await apiFetch(
-        `/api/firefighters/${firefighterId}/approve`,
-        { method: "PATCH" },
+        `/api/firefighters/${approvingFirefighter.id}/approve`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            firefighterStatusId: Number(selectedStatusId) || null,
+          }),
+        },
       );
       if (!response.ok) {
         const message = await readErrorMessage(response);
         throw new Error(message);
       }
+
+      setPendingFirefighters((prev) =>
+        prev.filter(
+          (firefighter) => approvingFirefighter.id !== firefighter.id,
+        ),
+      );
+
+      setSuccess(`Strażak został zaakceptowany`);
+      handleCloseApprove();
     } catch (error) {
       setError(error.message);
     }
@@ -97,7 +122,7 @@ export default function Invitations() {
 
     try {
       const response = await apiFetch(
-        `/api/firefighter-invitations/${token}/poster`,
+        `/api/station-invitations/${token}/poster`,
         {
           method: "GET",
         },
@@ -121,6 +146,21 @@ export default function Invitations() {
     }
   };
 
+  const loadStatuses = async () => {
+    setError("");
+    try {
+      const response = await apiFetch(`/api/firefighter-statuses`);
+      if (!response.ok) {
+        throw new Error("Brak możliwości pobrania statusów");
+      }
+
+      const data = await response.json();
+      setStatuses(data);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -130,7 +170,7 @@ export default function Invitations() {
 
     try {
       const response = await apiFetch(
-        `/api/firefighter-invitations/generate?validDays=${validDays}`,
+        `/api/station-invitations/generate?validDays=${validDays}`,
         {
           method: "POST",
         },
@@ -395,11 +435,69 @@ export default function Invitations() {
                         px-3 py-1 text-xs
                         font-medium text-slate-500
                       "
+                  ></span>
+                  <button
+                    type="button"
+                    onClick={() => setApprovingFirefighter(firefighter)}
+                    className="inline-flex items-center
+                        justify-center gap-2 rounded-lg
+                        bg-red-600 px-4 py-2.5
+                        font-semibold text-white transition
+                        hover:bg-red-700
+                        disabled:cursor-not-allowed
+                        disabled:opacity-60"
                   >
-                    ID: {firefighter.id}
-                  </span>
+                    <Plus size={19} />
+                    Akcpetuj
+                  </button>
                 </article>
               ))}
+            </div>
+          )}
+          {approvingFirefighter && (
+            // Warstwa 1: tło na cały ekran, przyciemnione, wyśrodkowuje okienko
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+              {/* Warstwa 2: okienko */}
+              <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-lg">
+                <h2 className="mb-4 text-lg font-semibold text-slate-900">
+                  Wybierz status nowego strażaka
+                </h2>
+
+                <form onSubmit={handleApprove} className="space-y-5">
+                  <select
+                    name="selectedStatusId"
+                    value={selectedStatusId}
+                    onChange={(e) => setSelectedStatusId(e.target.value)}
+                    required
+                    className="
+                    w-full rounded-lg border border-slate-300
+                    px-3 py-2.5 outline-none transition
+                    focus:border-red-500
+                    focus:ring-2 focus:ring-red-100
+                  "
+                  >
+                    <option value="">Wybierz status</option>
+                    {statuses.map((status) => (
+                      <option key={status.id} value={status.id}>
+                        {status.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="submit"
+                    className="w-full rounded-lg bg-red-600 px-4 py-2.5 font-medium text-white transition hover:bg-red-700 mb-2.5"
+                  >
+                    Wybierz
+                  </button>
+                </form>
+                <button
+                  type="button"
+                  onClick={handleCloseApprove}
+                  className="w-full rounded-lg bg-red-600 px-4 py-2.5 font-medium text-white transition hover:bg-red-700"
+                >
+                  Zamknij
+                </button>
+              </div>
             </div>
           )}
         </section>
