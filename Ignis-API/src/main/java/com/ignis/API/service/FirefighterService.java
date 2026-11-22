@@ -152,11 +152,10 @@ public class FirefighterService {
 
         candidatFirefighter.getUser().activate();
 
-        if (statusId != null) {
-            FirefighterStatus firefighterStatus = firefighterStatusRepository.findById(statusId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono statusu"));
+        FirefighterStatus firefighterStatus = firefighterStatusRepository.findById(statusId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono statusu"));
 
-            candidatFirefighter.changeStatus(firefighterStatus);
-        }
+        candidatFirefighter.changeStatus(firefighterStatus);
+
     }
 }

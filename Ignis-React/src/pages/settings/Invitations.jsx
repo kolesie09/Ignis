@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, UserPlus, Plus } from "lucide-react";
+import { ArrowLeft, UserPlus, Plus, User } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 import { apiFetch } from "../../api/api.js";
 export default function Invitations() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [pendingFirefighters, setPendingFirefighters] = useState([]);
+  const [loadingPending, setLoadingPending] = useState(true);
 
   const [validDays, setValidDays] = useState("7");
   const [saving, setSaving] = useState(false);
@@ -16,6 +18,10 @@ export default function Invitations() {
   const [copyStatus, setCopyStatus] = useState("");
 
   const inviteLink = `${window.location.origin}/register?token=${token}`;
+
+  useEffect(() => {
+    loadingPendingFirefighters();
+  }, []);
 
   // Wyciąga komunikat błędu z odpowiedzi backendu.
   // .catch(() => null) – gdy odpowiedź nie jest JSON-em, nie wysypujemy się.
@@ -31,12 +37,55 @@ export default function Invitations() {
     setCopyStatus("");
   };
 
+  const loadingPendingFirefighters = async () => {
+    try {
+      setLoadingPending(true);
+      setError("");
+
+      // apiFetch sam dokleja token JWT do nagłówka Authorization.
+      const response = await apiFetch("/api/firefighters/pending");
+
+      // response.ok === true tylko dla statusów 200–299.
+      if (!response.ok) {
+        throw new Error(
+          "Nie udało się pobrać listy nowo zarejestrowanych strażaków",
+        );
+      }
+
+      const data = await response.json();
+      setPendingFirefighters(data);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      // finally wykona się zawsze – po sukcesie i po błędzie.
+      setLoadingPending(false);
+    }
+  };
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(inviteLink);
       setCopyStatus("copied");
     } catch {
       setCopyStatus("error");
+    }
+  };
+
+  const handleApprove = async (firefighterId) => {
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await apiFetch(
+        `/api/firefighters/${firefighterId}/approve`,
+        { method: "PATCH" },
+      );
+      if (!response.ok) {
+        const message = await readErrorMessage(response);
+        throw new Error(message);
+      }
+    } catch (error) {
+      setError(error.message);
     }
   };
 
@@ -48,7 +97,7 @@ export default function Invitations() {
 
     try {
       const response = await apiFetch(
-        `/api/station-invitations/${token}/poster`,
+        `/api/firefighter-invitations/${token}/poster`,
         {
           method: "GET",
         },
@@ -81,7 +130,7 @@ export default function Invitations() {
 
     try {
       const response = await apiFetch(
-        `/api/station-invitations/generate?validDays=${validDays}`,
+        `/api/firefighter-invitations/generate?validDays=${validDays}`,
         {
           method: "POST",
         },
@@ -156,14 +205,14 @@ export default function Invitations() {
           {success}
         </div>
       )}
-
-      <section
-        className="
-            h-fit rounded-xl border border-slate-200
-            bg-white p-6 shadow-sm
-          "
-      >
-        <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
+      {/* Dwie kolumny na dużym ekranie (380px + reszta), jedna pod drugą na telefonie */}
+      <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
+        <section
+          className="
+              h-fit rounded-xl border border-slate-200
+              bg-white p-6 shadow-sm
+            "
+        >
           <div className="mb-5 flex items-center gap-3">
             <Plus size={21} className="text-red-600" />
 
@@ -176,9 +225,9 @@ export default function Invitations() {
             <label className="block">
               <span
                 className="
-                  mb-2 block text-sm font-medium
-                  text-slate-700
-                "
+                    mb-2 block text-sm font-medium
+                    text-slate-700
+                  "
               >
                 Ważność linku
               </span>
@@ -189,11 +238,11 @@ export default function Invitations() {
                 onChange={(e) => setValidDays(e.target.value)}
                 required
                 className="
-                  w-full rounded-lg border border-slate-300
-                  px-3 py-2.5 outline-none transition
-                  focus:border-red-500
-                  focus:ring-2 focus:ring-red-100
-                "
+                    w-full rounded-lg border border-slate-300
+                    px-3 py-2.5 outline-none transition
+                    focus:border-red-500
+                    focus:ring-2 focus:ring-red-100
+                  "
               >
                 <option value="">Wybierz liczbę dni</option>
                 {dayOptions.map((days) => (
@@ -209,14 +258,14 @@ export default function Invitations() {
               type="submit"
               disabled={saving}
               className="
-                inline-flex w-full items-center
-                justify-center gap-2 rounded-lg
-                bg-red-600 px-4 py-2.5
-                font-semibold text-white transition
-                hover:bg-red-700
-                disabled:cursor-not-allowed
-                disabled:opacity-60
-              "
+                  inline-flex w-full items-center
+                  justify-center gap-2 rounded-lg
+                  bg-red-600 px-4 py-2.5
+                  font-semibold text-white transition
+                  hover:bg-red-700
+                  disabled:cursor-not-allowed
+                  disabled:opacity-60
+                "
             >
               <Plus size={19} />
               {saving ? "Generowanie..." : "Wygeneruj link"}
@@ -279,8 +328,82 @@ export default function Invitations() {
               </div>
             </div>
           )}
-        </div>
-      </section>
+        </section>
+        {/* === Prawa kolumna === */}
+        <section
+          className="
+              overflow-hidden rounded-xl
+              border border-slate-200
+              bg-white shadow-sm
+            "
+        >
+          <div className="border-b border-slate-200 px-6 py-4">
+            <h2 className="text-lg font-semibold text-slate-900">
+              Liczba oczekujących na akceptacje
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Liczba oczekujących: {pendingFirefighters.length}
+            </p>
+          </div>
+
+          {/* Trzy stany: ładowanie → pusta lista → lista z danymi */}
+          {loadingPending ? (
+            <div className="p-8 text-center text-slate-500">
+              Pobieranie oczekujących...
+            </div>
+          ) : pendingFirefighters.length === 0 ? (
+            <div className="p-8 text-center">
+              <User size={38} className="mx-auto mb-3 text-slate-300" />
+
+              <p className="font-medium text-slate-700">Brak oczekującyh</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-200">
+              {pendingFirefighters.map((firefighter) => (
+                // key = stabilne ID z bazy, żeby React rozpoznawał elementy listy
+                <article
+                  key={firefighter.id}
+                  className="
+                      flex items-center gap-4
+                      px-6 py-4
+                    "
+                >
+                  <div
+                    className="
+                        flex h-10 w-10 shrink-0
+                        items-center justify-center
+                        rounded-lg bg-slate-100
+                        text-slate-600
+                      "
+                  >
+                    <User size={20} />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-slate-900">
+                      {firefighter.name} {firefighter.lastname}
+                    </h3>
+                    <h4 className="mt-1 text-sm text-slate-500">
+                      {firefighter.email}
+                    </h4>
+                  </div>
+
+                  <span
+                    className="
+                        rounded-full bg-slate-100
+                        px-3 py-1 text-xs
+                        font-medium text-slate-500
+                      "
+                  >
+                    ID: {firefighter.id}
+                  </span>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
     </main>
   );
 }

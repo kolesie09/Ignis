@@ -16,6 +16,8 @@ import com.ignis.API.dto.request.ApproveFirefighterRequest;
 import com.ignis.API.dto.response.FirefighterResponse;
 import com.ignis.API.service.FirefighterService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/firefighters")
 public class FirefighterController {
@@ -52,8 +54,8 @@ public class FirefighterController {
 
     @PatchMapping("/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> patchApproveCandidat(@PathVariable Long id, @RequestBody(required = false) ApproveFirefighterRequest request, Authentication authentication) {
-        Long statusId = (request != null) ? request.firefighterStatusId() : null;
+    public ResponseEntity<Void> patchApproveCandidat(@PathVariable Long id, @Valid @RequestBody ApproveFirefighterRequest request, Authentication authentication) {
+        Long statusId = request.firefighterStatusId();
         firefighterService.approveFirefighter(id, statusId, authentication.getName());
         return ResponseEntity.noContent().build();
     }

@@ -35,3 +35,6 @@ Thumbs.db
 # Database dumps
 BAZA_DANYCH/
 *.sql
+
+
+*.pdf
