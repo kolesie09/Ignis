@@ -119,31 +119,41 @@ public class FirefighterService {
                 .toList();
     }
 
-    public List<FirefighterResponse> getPendingFirefightersFromMyStation(String login) {
+    public List<FirefighterResponse> getPendingFirefightersFromMyStation(String login, boolean isSuperAdmin) {
+        if (isSuperAdmin) {
+            return firefighterRepository.findByUserActiveFalse()
+                    .stream()
+                    .map(this::mapToResponse)
+                    .toList();
+        } else {
+            Firefighter currentFirefighter = firefighterRepository.findByUserLogin(login)
+                    .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + login));
 
-        Firefighter currentFirefighter = firefighterRepository.findByUserLogin(login)
-                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + login));
+            Long fireStationId = currentFirefighter.getFireStation().getId();
 
-        Long fireStationId = currentFirefighter.getFireStation().getId();
+            return firefighterRepository.findByFireStationIdAndUserActiveFalse(fireStationId)
+                    .stream()
+                    .map(this::mapToResponse)
+                    .toList();
 
-        return firefighterRepository.findByFireStationIdAndUserActiveFalse(fireStationId)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        }
+
     }
 
     @Transactional
-    public void approveFirefighter(Long firefighterId, Long statusId, String adminLogin) {
-        Firefighter adminFirefighter = firefighterRepository.findByUserLogin(adminLogin)
-                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + adminLogin));
-
-        Long adminStation = adminFirefighter.getFireStation().getId();
+    public void approveFirefighter(Long firefighterId, Long statusId, String adminLogin, boolean isSuperAdmin) {
 
         Firefighter candidatFirefighter = firefighterRepository.findById(firefighterId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono kandydata"));
 
-        if (!candidatFirefighter.getFireStation().getId().equals(adminStation)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono kandydata");
+        if (!isSuperAdmin) {
+            Firefighter adminFirefighter = firefighterRepository.findByUserLogin(adminLogin)
+                    .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + adminLogin));
+
+            Long adminStation = adminFirefighter.getFireStation().getId();
+            if (!candidatFirefighter.getFireStation().getId().equals(adminStation)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono kandydata");
+            }
         }
 
         if (candidatFirefighter.getUser().isActive()) {

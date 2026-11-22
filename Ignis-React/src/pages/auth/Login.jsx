@@ -84,14 +84,6 @@ function Login({ setRegistered, handleRegister }) {
             Zaloguj się
           </button>
         </form>
-
-        <button
-          className="hover:bg-blue-600 bg-blue-500 text-white w-full p-4 mt-4 rounded-md"
-          type="button"
-          onClick={() => navigate("/register")}
-        >
-          Zarejestruj się
-        </button>
       </div>
     </div>
   );

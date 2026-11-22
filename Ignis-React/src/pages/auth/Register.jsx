@@ -21,6 +21,7 @@ function Register({ handleSwitchToLogin }) {
   const token = searchParams.get("token");
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const readErrorMessage = async (response) => {
     const data = await response.text().catch(() => null);
@@ -74,6 +75,9 @@ function Register({ handleSwitchToLogin }) {
   };
 
   const register = async () => {
+    setError("");
+    setSuccess("");
+
     try {
       const response = await apiFetch(`/api/station-invitations/register`, {
         method: "POST",
@@ -90,6 +94,10 @@ function Register({ handleSwitchToLogin }) {
         const message = await readErrorMessage(response);
         throw new Error(message);
       }
+
+      setSuccess(
+        "Konto zostało zarejestrowane. Oczekuj na potwierdzenie przez admina",
+      );
     } catch (error) {
       setError(error.message);
     }
@@ -212,6 +220,7 @@ function Register({ handleSwitchToLogin }) {
             />
           </div>
           {error && <p className="text-red-500">{error}</p>}
+          {success && <p className="text-green-500">{success}</p>}
           <button
             className="hover:bg-blue-600 bg-blue-500 text-white w-full p-4 mt-4 rounded-md"
             type="submit"

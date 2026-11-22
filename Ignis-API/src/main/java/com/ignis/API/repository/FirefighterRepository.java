@@ -18,4 +18,6 @@ public interface FirefighterRepository extends JpaRepository<Firefighter, Long> 
 
     List<Firefighter> findByFireStationIdAndUserActiveFalse(Long fireStationId);
 
+    List<Firefighter> findByUserActiveFalse();
+
 }

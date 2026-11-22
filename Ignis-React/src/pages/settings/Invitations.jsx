@@ -2,13 +2,19 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, UserPlus, Plus, User } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 import { apiFetch } from "../../api/api.js";
 export default function Invitations() {
+  const { hasRole } = useAuth();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [pendingFirefighters, setPendingFirefighters] = useState([]);
   const [loadingPending, setLoadingPending] = useState(true);
+  const isSuperAdmin = hasRole("ROLE_SUPER_ADMIN");
+
+  const [fireStations, setFireStations] = useState([]);
+  const [selectedFireStationId, setSelectedFireStationId] = useState("");
 
   const [statuses, setStatuses] = useState([]);
   const [approvingFirefighter, setApprovingFirefighter] = useState(null);
@@ -26,6 +32,7 @@ export default function Invitations() {
   useEffect(() => {
     loadingPendingFirefighters();
     loadStatuses();
+    loadFireStations();
   }, []);
 
   // Wyciąga komunikat błędu z odpowiedzi backendu.
@@ -35,6 +42,28 @@ export default function Invitations() {
     const data = await response.text().catch(() => null);
 
     return data || "Nie udało się wygenerować linku";
+  };
+
+  // GET /api/fire-stations – lista jednostek (z gminą w środku).
+  const loadFireStations = async () => {
+    if (isSuperAdmin) {
+      try {
+        setError("");
+
+        // apiFetch sam dokleja token JWT do nagłówka Authorization.
+        const response = await apiFetch("/api/fire-stations");
+
+        // response.ok === true tylko dla statusów 200–299.
+        if (!response.ok) {
+          throw new Error("Nie udało się pobrać jednostek");
+        }
+
+        const data = await response.json();
+        setFireStations(data);
+      } catch (error) {
+        setError(error.message);
+      }
+    }
   };
 
   const handleClose = () => {
@@ -167,14 +196,18 @@ export default function Invitations() {
     setError("");
     setSuccess("");
     setSaving(true);
+    let url;
+
+    if (selectedFireStationId) {
+      url = `/api/station-invitations/generate?validDays=${validDays}&fireStationId=${selectedFireStationId}`;
+    } else {
+      url = `/api/station-invitations/generate?validDays=${validDays}`;
+    }
 
     try {
-      const response = await apiFetch(
-        `/api/station-invitations/generate?validDays=${validDays}`,
-        {
-          method: "POST",
-        },
-      );
+      const response = await apiFetch(url, {
+        method: "POST",
+      });
 
       if (!response.ok) {
         const message = await readErrorMessage(response);
@@ -261,7 +294,38 @@ export default function Invitations() {
             </h2>
           </div>
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Gmina – opcje z /api/municipalities; value="" oznacza "nic nie wybrano" */}
+            {isSuperAdmin && (
+              <label className="block">
+                <span
+                  className="
+                    mb-2 block text-sm font-medium
+                    text-slate-700
+                  "
+                >
+                  Wybierz jednostkę
+                </span>
+
+                <select
+                  name="fireStations"
+                  value={selectedFireStationId}
+                  onChange={(e) => setSelectedFireStationId(e.target.value)}
+                  className="
+                    w-full rounded-lg border border-slate-300
+                    px-3 py-2.5 outline-none transition
+                    focus:border-red-500
+                    focus:ring-2 focus:ring-red-100
+                  "
+                >
+                  <option value="">Wybierz jednostkę</option>
+                  {fireStations.map((fireStation) => (
+                    <option key={fireStation.id} value={fireStation.id}>
+                      {fireStation.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+
             <label className="block">
               <span
                 className="
@@ -425,6 +489,9 @@ export default function Invitations() {
                       {firefighter.name} {firefighter.lastname}
                     </h3>
                     <h4 className="mt-1 text-sm text-slate-500">
+                      {isSuperAdmin && (
+                        <span>{firefighter.fireStation} &middot; </span>
+                      )}
                       {firefighter.email}
                     </h4>
                   </div>

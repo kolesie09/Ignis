@@ -49,14 +49,19 @@ public class FirefighterController {
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<FirefighterResponse>> getPendingFirefighters(Authentication authentication) {
-        return ResponseEntity.ok(firefighterService.getPendingFirefightersFromMyStation(authentication.getName()));
+        boolean isSuperAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+
+        return ResponseEntity.ok(firefighterService.getPendingFirefightersFromMyStation(authentication.getName(), isSuperAdmin));
     }
 
     @PatchMapping("/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> patchApproveCandidat(@PathVariable Long id, @Valid @RequestBody ApproveFirefighterRequest request, Authentication authentication) {
         Long statusId = request.firefighterStatusId();
-        firefighterService.approveFirefighter(id, statusId, authentication.getName());
+        boolean isSuperAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+        firefighterService.approveFirefighter(id, statusId, authentication.getName(), isSuperAdmin);
         return ResponseEntity.noContent().build();
     }
 

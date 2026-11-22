@@ -10,8 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ignis.API.dto.request.RegisterByInvitationRequest;
+import com.ignis.API.entity.FireStation;
 import com.ignis.API.entity.Firefighter;
 import com.ignis.API.entity.StationInvitation;
+import com.ignis.API.repository.FireStationRepository;
 import com.ignis.API.repository.FirefighterRepository;
 import com.ignis.API.repository.StationInvitationRepository;
 
@@ -23,15 +25,18 @@ public class StationInvitationService {
     private final FirefighterRepository firefighterRepository;
     private final UserService userService;
 
-    public StationInvitationService(StationInvitationRepository stationInvitationRepository, FirefighterRepository firefighterRepository, UserService userService) {
+    private final FireStationRepository fireStationRepository;
+
+    public StationInvitationService(StationInvitationRepository stationInvitationRepository, FirefighterRepository firefighterRepository, UserService userService, FireStationRepository fireStationRepository) {
         this.stationInvitationRepository = stationInvitationRepository;
         this.firefighterRepository = firefighterRepository;
         this.userService = userService;
 
+        this.fireStationRepository = fireStationRepository;
     }
 
     @Transactional
-    public String createInvitation(String login, int validDays) {
+    public String createInvitation(String login, int validDays, Long fireStationId, boolean isSuperAdmin) {
 
         if (validDays <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Liczba dni ważności musi być większa od zera.");
@@ -45,7 +50,18 @@ public class StationInvitationService {
             LocalDateTime expiresAt = LocalDateTime.now().plusDays(validDays);
             String token = UUID.randomUUID().toString();
 
-            StationInvitation invitation = new StationInvitation(token, adminFirefighter.getFireStation(), adminFirefighter.getUser(), expiresAt);
+            FireStation fireStation;
+            if (fireStationId != null) {
+                if (!isSuperAdmin) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Nie masz uprawnień do wyboru jednostki");
+                }
+                fireStation = fireStationRepository.findById(fireStationId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono danej jednostki"));
+            } else {
+                fireStation = adminFirefighter.getFireStation();
+            }
+
+            StationInvitation invitation = new StationInvitation(token, fireStation, adminFirefighter.getUser(), expiresAt);
             stationInvitationRepository.save(invitation);
 
             return token;

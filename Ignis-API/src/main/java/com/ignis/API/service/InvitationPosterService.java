@@ -44,15 +44,17 @@ public class InvitationPosterService {
     }
 
     @Transactional
-    public byte[] generatePoster(String token, String adminLogin) {
+    public byte[] generatePoster(String token, String adminLogin, boolean isSuperAdmin) {
 
         StationInvitation invitation = stationInvitationRepository.findByToken(token)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono zaproszenia"));
 
-        Firefighter firefighter = firefighterRepository.findByUserLogin(adminLogin).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono jednostki dla tego strażaka"));
+        if (!isSuperAdmin) {
+            Firefighter firefighter = firefighterRepository.findByUserLogin(adminLogin).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono jednostki dla tego strażaka"));
 
-        if (!invitation.getFireStation().getId().equals(firefighter.getFireStation().getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono zaproszenia");
+            if (!invitation.getFireStation().getId().equals(firefighter.getFireStation().getId())) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono zaproszenia");
+            }
         }
 
         String url = frontendUrl + "/register?token=" + token;

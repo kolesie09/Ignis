@@ -39,8 +39,11 @@ public class StationInvitationController {
 
     @PostMapping("/generate")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> getGenerateInvitation(Authentication authentication, @RequestParam("validDays") int validDays) {
-        String token = stationInvitationService.createInvitation(authentication.getName(), validDays);
+    public ResponseEntity<String> getGenerateInvitation(Authentication authentication, @RequestParam("validDays") int validDays, @RequestParam(value = "fireStationId", required = false) Long fireStationId) {
+        boolean isSuperAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+
+        String token = stationInvitationService.createInvitation(authentication.getName(), validDays, fireStationId, isSuperAdmin);
         return ResponseEntity.status(HttpStatus.CREATED).body(token);
     }
 
@@ -54,8 +57,10 @@ public class StationInvitationController {
     @GetMapping("/{token}/poster")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<byte[]> poster(@PathVariable String token, Authentication authentication) {
+        boolean isSuperAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
 
-        byte[] pdf = invitationPosterService.generatePoster(token, authentication.getName());
+        byte[] pdf = invitationPosterService.generatePoster(token, authentication.getName(), isSuperAdmin);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
