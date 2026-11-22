@@ -1,10 +1,12 @@
 import React, { use, useState } from "react";
 import App from "../../App";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { apiFetch } from "../../api/api";
 
 function Register({ handleSwitchToLogin }) {
   const [imie, setImie] = useState("");
   const [nazwisko, setNazwisko] = useState("");
+  const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const [darkMode, _setDarkMode] = useState(true);
@@ -12,16 +14,26 @@ function Register({ handleSwitchToLogin }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [imieError, setImieError] = useState(false);
   const [nazwiskoError, setNazwiskoError] = useState(false);
+  const [loginError, setLoginError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
 
   const [error, setError] = useState("");
+
+  const readErrorMessage = async (response) => {
+    const data = await response.text().catch(() => null);
+
+    return data || "Nie udało się zarejestrować strażaka";
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault(); // Zapobiega przeładowaniu strony przy submit
 
     setImieError(false); // Resetuj błąd imienia przy każdym submit
     setNazwiskoError(false); // Resetuj błąd nazwiska przy każdym submit
+    setLoginError(false); // Resetuj błąd loginu przy każdym submit
     setEmailError(false); // Resetuj błąd emaila przy każdym submit
     setPasswordError(false); // Resetuj błąd hasła przy każdym submit
 
@@ -31,6 +43,9 @@ function Register({ handleSwitchToLogin }) {
     if (!nazwisko) {
       setNazwiskoError(true);
     }
+    if (!login) {
+      setLoginError(true);
+    }
     if (!email) {
       setEmailError(true);
     }
@@ -38,7 +53,14 @@ function Register({ handleSwitchToLogin }) {
       setPasswordError(true);
     }
 
-    if (!imie || !nazwisko || !email || !password || !confirmPassword) {
+    if (
+      !imie ||
+      !nazwisko ||
+      !login ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
       setError("Wszystkie pola są wymagane");
       return;
     } else {
@@ -46,9 +68,30 @@ function Register({ handleSwitchToLogin }) {
         setError("Hasła nie są zgodne");
         return;
       } else {
-        setRegistered(true);
-        localStorage.setItem("registered", "true");
+        register();
       }
+    }
+  };
+
+  const register = async () => {
+    try {
+      const response = await apiFetch(`/api/station-invitations/register`, {
+        method: "POST",
+        body: JSON.stringify({
+          login: login || null,
+          password: password || null,
+          email: email || null,
+          name: imie || null,
+          lastName: nazwisko || null,
+          token: token || null,
+        }),
+      });
+      if (!response.ok) {
+        const message = await readErrorMessage(response);
+        throw new Error(message);
+      }
+    } catch (error) {
+      setError(error.message);
     }
   };
 
@@ -96,6 +139,23 @@ function Register({ handleSwitchToLogin }) {
               onChange={(e) => {
                 setNazwisko(e.target.value);
                 if (nazwiskoError) setNazwiskoError(false);
+                if (error) setError(false);
+              }}
+            />
+          </div>
+          <div>
+            <input
+              className={`border  w-full p-2 rounded-md mt-4 ${
+                loginError
+                  ? "border-red-500 placeholder-red-500"
+                  : "border-gray-300"
+              }`}
+              type="text"
+              placeholder="Login"
+              value={login}
+              onChange={(e) => {
+                setLogin(e.target.value);
+                if (loginError) setLoginError(false);
                 if (error) setError(false);
               }}
             />

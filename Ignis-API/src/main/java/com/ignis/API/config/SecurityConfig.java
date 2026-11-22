@@ -47,7 +47,7 @@ public class SecurityConfig {
                     );
 
                     corsConfiguration.setAllowedMethods(List.of(
-                            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+                            "GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"
                     ));
 
                     corsConfiguration.setAllowedHeaders(List.of("*"));
