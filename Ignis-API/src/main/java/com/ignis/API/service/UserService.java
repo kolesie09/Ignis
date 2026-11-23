@@ -16,8 +16,6 @@ import com.ignis.API.security.JwtService;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ignis.API.dto.request.CreateUserRequest;
-import com.ignis.API.dto.response.CreateUserResponse;
 import com.ignis.API.exception.DuplicateResourceException;
 import com.ignis.API.repository.FirefighterRepository;
 import com.ignis.API.repository.FirefighterStatusRepository;
@@ -53,68 +51,6 @@ public class UserService {
         this.roleRepository = roleRepository;
         this.firefighterRepository = firefighterRepository;
         this.firefighterStatusRepository = firefighterStatusRepository;
-    }
-
-    // Prosta metoda do zapisu użytkownika w bazie
-    @Transactional
-    public CreateUserResponse createUser(CreateUserRequest request, String adminLogin) {
-        if (userRepository.existsByLogin(request.getLogin())) {
-            throw new DuplicateResourceException("Login jest już zajęty!");
-        }
-
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("Email jest już zajęty!");
-        }
-
-        FireStation adminStation = firefighterRepository.findByUserLogin(adminLogin)
-                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + adminLogin))
-                .getFireStation();
-
-        // 1.Pobieramy surowe hasło z obiektu user
-        String rawPassword = request.getPassword();
-
-        // 2.Hashujemy hasło za pomocą BCrypt
-        String encodedPassword = passwordEncoder.encode(rawPassword);
-
-        List<Role> roles = roleRepository.findAllById(request.getRoleIds());
-
-        if (roles.size() != request.getRoleIds().size()) {
-            throw new ResourceNotFoundException("Nie znaleziono jednej lub więcej ról");
-        }
-
-        // 3.Ustawiamy zahashowane hasło w obiekcie user
-        User user = new User(
-                request.getLogin(),
-                encodedPassword,
-                request.getEmail(),
-                request.getName(),
-                request.getLastName(),
-                request.getDateOfBirth(),
-                request.getNick()
-        );
-        user.setRoles(new HashSet<>(roles));
-        user.activate();
-
-        FirefighterStatus firefighterStatus = firefighterStatusRepository.findById(request.getFirefighterStatusId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Nie znaleziono statusu strażaka o podanym ID"
-                ));
-
-        User savedUser = userRepository.save(user);
-
-        firefighterRepository.save(new Firefighter(savedUser, firefighterStatus, adminStation));
-
-        return new CreateUserResponse(
-                savedUser.getId(),
-                savedUser.getLogin(),
-                savedUser.getEmail(),
-                savedUser.getName(),
-                savedUser.getLastName(),
-                savedUser.getDateOfBirth(),
-                savedUser.getNick(),
-                savedUser.getRoles().stream().map(Role::getName).collect(Collectors.toSet())
-        );
     }
 
     public User getUserByLogin(String login) {

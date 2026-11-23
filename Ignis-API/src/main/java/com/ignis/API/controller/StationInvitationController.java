@@ -22,8 +22,11 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.ignis.API.service.InvitationPosterService;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpHeaders;
+
+import com.ignis.API.security.SecurityUtils;
 
 @RestController
 @RequestMapping("/api/station-invitations")
@@ -40,8 +43,7 @@ public class StationInvitationController {
     @PostMapping("/generate")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> getGenerateInvitation(Authentication authentication, @RequestParam("validDays") int validDays, @RequestParam(value = "fireStationId", required = false) Long fireStationId) {
-        boolean isSuperAdmin = authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+        boolean isSuperAdmin = SecurityUtils.isSuperAdmin(authentication);
 
         String token = stationInvitationService.createInvitation(authentication.getName(), validDays, fireStationId, isSuperAdmin);
         return ResponseEntity.status(HttpStatus.CREATED).body(token);
@@ -57,8 +59,7 @@ public class StationInvitationController {
     @GetMapping("/{token}/poster")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<byte[]> poster(@PathVariable String token, Authentication authentication) {
-        boolean isSuperAdmin = authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+        boolean isSuperAdmin = SecurityUtils.isSuperAdmin(authentication);
 
         byte[] pdf = invitationPosterService.generatePoster(token, authentication.getName(), isSuperAdmin);
 

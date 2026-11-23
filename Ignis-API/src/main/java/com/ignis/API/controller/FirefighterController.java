@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ignis.API.dto.request.ApproveFirefighterRequest;
 import com.ignis.API.dto.response.FirefighterResponse;
+import com.ignis.API.security.SecurityUtils;
 import com.ignis.API.service.FirefighterService;
 
 import jakarta.validation.Valid;
@@ -49,9 +50,7 @@ public class FirefighterController {
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<FirefighterResponse>> getPendingFirefighters(Authentication authentication) {
-        boolean isSuperAdmin = authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
-
+        boolean isSuperAdmin = SecurityUtils.isSuperAdmin(authentication);
         return ResponseEntity.ok(firefighterService.getPendingFirefightersFromMyStation(authentication.getName(), isSuperAdmin));
     }
 
@@ -59,8 +58,7 @@ public class FirefighterController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> patchApproveCandidat(@PathVariable Long id, @Valid @RequestBody ApproveFirefighterRequest request, Authentication authentication) {
         Long statusId = request.firefighterStatusId();
-        boolean isSuperAdmin = authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPER_ADMIN"));
+        boolean isSuperAdmin = SecurityUtils.isSuperAdmin(authentication);
         firefighterService.approveFirefighter(id, statusId, authentication.getName(), isSuperAdmin);
         return ResponseEntity.noContent().build();
     }

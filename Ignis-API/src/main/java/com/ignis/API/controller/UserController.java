@@ -17,9 +17,6 @@ import com.ignis.API.service.UserService;
 
 import jakarta.validation.Valid;
 
-import com.ignis.API.dto.request.CreateUserRequest;
-import com.ignis.API.dto.response.CreateUserResponse;
-
 @CrossOrigin(origins = "${app.cors.allowed-origin-patterns}")
 @RestController
 @RequestMapping("/api/users") // Główny adres dla tego kontrolera 🌐
@@ -32,13 +29,6 @@ public class UserController {
     }
 
     // Ta adnotacja oznacza, że metoda reaguje na żądania typu POST (tworzenie)
-    @PostMapping
-    @PreAuthorize("hasRole('ADMIN')") // Tylko użytkownicy z rolą ADMIN mogą tworzyć nowych użytkowników
-    public ResponseEntity<CreateUserResponse> createUser(@Valid @RequestBody CreateUserRequest request, Authentication authentication) {
-        CreateUserResponse response = userService.createUser(request, authentication.getName());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
 
