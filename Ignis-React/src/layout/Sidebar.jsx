@@ -78,7 +78,10 @@ export default function Sidebar({ open, onOpenChange }) {
               label="Statystyki"
               icon={ChartNoAxesCombined}
               subItems={[
-                { label: "Strażackie", to: "/statistics/firefighter" }, // Zmieniono z "/statistics/firefighter"
+                {
+                  label: "Strażackie",
+                  to: "/statistics/firefighterstatistics",
+                }, // Zmieniono z "/statistics/firefighter"
                 { label: "Karta szkoleń", to: "#billing" },
                 { label: "Karta ćwiczeń", to: "#invoice" },
                 { label: "Karta kierowcy", to: "#invoice" },

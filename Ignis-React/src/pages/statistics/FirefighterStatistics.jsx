@@ -5,7 +5,7 @@ import { Card, CardBody } from "../../components/Card";
 
 import SelectInput from "../../components/SelectInput";
 
-export default function Firefighter() {
+export default function FirefighterStatistics() {
   const [yearValue, setYearValue] = useState("");
   const yearOptions = useMemo(
     () =>
@@ -13,7 +13,7 @@ export default function Firefighter() {
         .slice() // (opcjonalnie) kopia
         .sort((a, b) => b.year - a.year) // malejąco
         .map((y) => ({ value: String(y.year), label: String(y.year) })),
-    []
+    [],
   );
 
   return (

@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import AppLayout from "./AppLayout";
 import DepartureCard from "../pages/documents/Departurecard.jsx";
-import Firefighter from "../pages/statistics/Firefighter.jsx";
+import FirefighterStatistics from "../pages/statistics/FirefighterStatistics.jsx";
 import MyAccount from "../pages/administration/MyAccount.jsx";
 import Login from "../pages/auth/Login.jsx";
 import Register from "../pages/auth/Register.jsx";
@@ -17,7 +17,7 @@ import CardDeparture from "../pages/documents/card/CardDeparture.jsx";
 import CardDetails from "../pages/documents/card/CardDetails.jsx";
 import CardDepartureUser from "../pages/documents/card/CardDepartureUser.jsx";
 import { RequireAuth } from "../context/RequireAuth.jsx";
-import Firefighters from "../pages/firefighters/Firefighters.jsx";
+import Firefighters from "../pages/settings/Firefighters.jsx";
 import Invitations from "../pages/settings/Invitations.jsx";
 
 export const router = createBrowserRouter([
@@ -48,8 +48,12 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "firefighters",
-        element: <Firefighters />,
+        path: "settings/firefighters",
+        element: (
+          <RequireRole allowedRoles={["ROLE_ADMIN", "ROLE_SUPER_ADMIN"]}>
+            <Firefighters />
+          </RequireRole>
+        ),
       },
       {
         path: "documents/history/card/:id",
@@ -80,8 +84,8 @@ export const router = createBrowserRouter([
         path: "statistics",
         children: [
           {
-            path: "firefighter",
-            element: <Firefighter />,
+            path: "firefighterstatistics",
+            element: <FirefighterStatistics />,
           },
         ],
       },

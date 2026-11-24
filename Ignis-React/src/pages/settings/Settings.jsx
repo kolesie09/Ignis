@@ -1,30 +1,12 @@
 import { Link } from "react-router-dom";
-import {
-  Building2,
-  ChevronRight,
-  ShieldCheck,
-  UserCog,
-  UserPlus,
-} from "lucide-react";
+import { Building2, ChevronRight, User, UserPlus } from "lucide-react";
 
 const settingsItems = [
   {
-    title: "Dodaj użytkownika",
-    description: "Utwórz nowe konto użytkownika aplikacji.",
-    icon: UserPlus,
-    to: "/settings/users/add",
-  },
-  {
-    title: "Użytkownicy i role",
-    description: "Przeglądaj użytkowników oraz nadawaj im role.",
-    icon: UserCog,
-    to: "/settings/users",
-  },
-  {
-    title: "Zarządzaj rolami",
-    description: "Dodawaj i edytuj role dostępne w aplikacji.",
-    icon: ShieldCheck,
-    to: "/settings/roles",
+    title: "Strażacy",
+    description: "Lista strażaków jednostki i ich uprawnienia",
+    icon: User,
+    to: "/settings/firefighters",
   },
   {
     title: "Dane jednostki",
