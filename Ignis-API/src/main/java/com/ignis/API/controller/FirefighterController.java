@@ -40,8 +40,9 @@ public class FirefighterController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FirefighterResponse> getFirefighterById(@PathVariable Long id) {
-        return ResponseEntity.ok(firefighterService.getFirefighterById(id));
+    public ResponseEntity<FirefighterResponse> getFirefighterById(@PathVariable Long id, Authentication authentication) {
+        boolean isSuperAdmin = SecurityUtils.isSuperAdmin(authentication);
+        return ResponseEntity.ok(firefighterService.getFirefighterById(authentication.getName(), id, isSuperAdmin));
     }
 
     @GetMapping("/me")

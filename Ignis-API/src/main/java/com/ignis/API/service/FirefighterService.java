@@ -94,9 +94,19 @@ public class FirefighterService {
     }
 
     // Metoda do pobierania strażaka po ID
-    public FirefighterResponse getFirefighterById(Long id) {
+    public FirefighterResponse getFirefighterById(String login, Long id, boolean isSuperAdmin) {
         Firefighter firefighter = firefighterRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka o ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono strażaka"));
+
+        if (!isSuperAdmin) {
+            Firefighter adminFirefighter = firefighterRepository.findByUserLogin(login)
+                    .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + login));
+
+            Long adminStation = adminFirefighter.getFireStation().getId();
+            if (!firefighter.getFireStation().getId().equals(adminStation)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono strażaka");
+            }
+        }
 
         return mapToResponse(firefighter);
     }
