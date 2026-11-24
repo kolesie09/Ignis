@@ -19,6 +19,7 @@ import CardDepartureUser from "../pages/documents/card/CardDepartureUser.jsx";
 import { RequireAuth } from "../context/RequireAuth.jsx";
 import Firefighters from "../pages/settings/Firefighters.jsx";
 import Invitations from "../pages/settings/Invitations.jsx";
+import FirefighterCard from "../pages/settings/FirefighterCard.jsx";
 
 export const router = createBrowserRouter([
   // Strony publiczne
@@ -47,14 +48,7 @@ export const router = createBrowserRouter([
         path: "dashboard",
         element: <Home />,
       },
-      {
-        path: "settings/firefighters",
-        element: (
-          <RequireRole allowedRoles={["ROLE_ADMIN", "ROLE_SUPER_ADMIN"]}>
-            <Firefighters />
-          </RequireRole>
-        ),
-      },
+
       {
         path: "documents/history/card/:id",
         element: <CardDetails />,
@@ -110,6 +104,23 @@ export const router = createBrowserRouter([
           </RequireRole>
         ),
       },
+      {
+        path: "settings/firefighters",
+        element: (
+          <RequireRole allowedRoles={["ROLE_ADMIN", "ROLE_SUPER_ADMIN"]}>
+            <Firefighters />
+          </RequireRole>
+        ),
+      },
+      {
+        path: "settings/firefighters/:id",
+        element: (
+          <RequireRole allowedRoles={["ROLE_ADMIN", "ROLE_SUPER_ADMIN"]}>
+            <FirefighterCard />
+          </RequireRole>
+        ),
+      },
+
       {
         path: "settings/fire-stations",
         element: (

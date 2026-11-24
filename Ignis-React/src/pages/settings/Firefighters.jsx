@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { apiFetch } from "../../api/api";
 import { Pencil } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -52,7 +53,6 @@ function Firefighters() {
               <th className="p-3">ID</th>
 
               <th className="p-3">Imię i nazwisko</th>
-              <th className="p-3">Status</th>
               {isSuperAdmin && <th className="p-3">Jednostka</th>}
               <th className="p-3"> </th>
             </tr>
@@ -74,7 +74,12 @@ function Firefighters() {
                 )}
 
                 <td className="p-3">
-                  <Pencil size={18} className="text-gray-400" />
+                  <Link to={`/settings/firefighters/${firefighter.id}`}>
+                    <Pencil
+                      size={18}
+                      className="text-gray-400 hover:text-gray-900"
+                    />
+                  </Link>
                 </td>
               </tr>
             ))}
