@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "../../api/api";
+import { Pencil } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 function Firefighters() {
   const [firefighters, setFirefighters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { hasRole } = useAuth();
+  const isSuperAdmin = hasRole("ROLE_SUPER_ADMIN");
 
   useEffect(() => {
     const fetchFirefighters = async () => {
@@ -46,12 +50,11 @@ function Firefighters() {
           <thead>
             <tr className="bg-gray-700 text-left text-gray-100">
               <th className="p-3">ID</th>
-              <th className="p-3">Login</th>
-              <th className="p-3">Imię</th>
-              <th className="p-3">Nazwisko</th>
-              <th className="p-3">Email</th>
+
+              <th className="p-3">Imię i nazwisko</th>
               <th className="p-3">Status</th>
-              <th className="p-3">Jednostka</th>
+              {isSuperAdmin && <th className="p-3">Jednostka</th>}
+              <th className="p-3"> </th>
             </tr>
           </thead>
 
@@ -62,12 +65,17 @@ function Firefighters() {
                 className="border-t border-gray-700 hover:bg-gray-700"
               >
                 <td className="p-3">{firefighter.id}</td>
-                <td className="p-3">{firefighter.login}</td>
-                <td className="p-3">{firefighter.name}</td>
-                <td className="p-3">{firefighter.lastname}</td>
-                <td className="p-3">{firefighter.email}</td>
-                <td className="p-3">{firefighter.status}</td>
-                <td className="p-3">{firefighter.fireStation}</td>
+
+                <td className="p-3">
+                  {firefighter.name} {firefighter.lastname}
+                </td>
+                {isSuperAdmin && (
+                  <td className="p-3">{firefighter.fireStation}</td>
+                )}
+
+                <td className="p-3">
+                  <Pencil size={18} className="text-gray-400" />
+                </td>
               </tr>
             ))}
           </tbody>
