@@ -17,6 +17,7 @@ import com.ignis.API.exception.ResourceNotFoundException;
 import com.ignis.API.repository.FireStationRepository;
 import com.ignis.API.repository.FirefighterRepository;
 import com.ignis.API.repository.FirefighterStatusRepository;
+import com.ignis.API.repository.RoleRepository;
 import com.ignis.API.repository.UserRepository;
 
 @Service
@@ -25,11 +26,13 @@ public class FirefighterService {
     private final FirefighterRepository firefighterRepository;
     private final FireStationRepository fireStationRepository;
     private final FirefighterStatusRepository firefighterStatusRepository;
+    private final RoleRepository roleRepository;
 
-    public FirefighterService(FirefighterRepository firefighterRepository, FireStationRepository fireStationRepository, FirefighterStatusRepository firefighterStatusRepository) {
+    public FirefighterService(FirefighterRepository firefighterRepository, FireStationRepository fireStationRepository, FirefighterStatusRepository firefighterStatusRepository, RoleRepository roleRepository) {
         this.firefighterRepository = firefighterRepository;
         this.fireStationRepository = fireStationRepository;
         this.firefighterStatusRepository = firefighterStatusRepository;
+        this.roleRepository = roleRepository;
     }
     // Metoda pomocnicza do mapowania encji Firefighter na DTO FirefighterResponse
 
@@ -168,4 +171,30 @@ public class FirefighterService {
         candidatFirefighter.changeStatus(firefighterStatus);
 
     }
+
+    @Transactional
+    public void grantAdmin(Long firefighterId) {
+        Firefighter firefighter = firefighterRepository.findById(firefighterId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono strażaka"));
+        Role role = roleRepository.findByName("ROLE_ADMIN")
+                .orElseThrow(() -> new IllegalStateException("Nie znaleziono roli"));
+
+        if (!firefighter.getUser().isActive()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Kandydat nie może być adminem");
+        }
+
+        firefighter.getUser().getRoles().add(role);
+
+    }
+
+    @Transactional
+    public void revokeAdmin(Long firefighterId) {
+        Firefighter firefighter = firefighterRepository.findById(firefighterId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono strażaka"));
+        Role role = roleRepository.findByName("ROLE_ADMIN")
+                .orElseThrow(() -> new IllegalStateException("Nie znaleziono roli"));
+
+        firefighter.getUser().getRoles().remove(role);
+    }
+
 }

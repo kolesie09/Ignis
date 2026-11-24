@@ -1,7 +1,5 @@
 package com.ignis.API.controller;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,8 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ignis.API.dto.request.LoginRequest;
 import com.ignis.API.dto.response.LoginResponse;
 import com.ignis.API.service.UserService;
-
-import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "${app.cors.allowed-origin-patterns}")
 @RestController

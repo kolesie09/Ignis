@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import com.ignis.API.security.SecurityUtils;
 import com.ignis.API.service.FirefighterService;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/firefighters")
@@ -63,4 +65,21 @@ public class FirefighterController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}/admin")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<Void> putAdmin(@PathVariable Long id) {
+
+        firefighterService.grantAdmin(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/admin")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<Void> deleteAdmin(@PathVariable Long id) {
+
+        firefighterService.revokeAdmin(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }
