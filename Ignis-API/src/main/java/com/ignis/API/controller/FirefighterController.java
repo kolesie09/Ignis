@@ -35,7 +35,8 @@ public class FirefighterController {
     @GetMapping
     public ResponseEntity<List<FirefighterResponse>> getAllFirefighters(Authentication authentication) {
         String login = authentication.getName();
-        return ResponseEntity.ok(firefighterService.getFirefightersFromMyStation(login));
+        boolean isSuperAdmin = SecurityUtils.isSuperAdmin(authentication);
+        return ResponseEntity.ok(firefighterService.getFirefighters(login, true, isSuperAdmin));
     }
 
     @GetMapping("/{id}")
@@ -53,7 +54,7 @@ public class FirefighterController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<FirefighterResponse>> getPendingFirefighters(Authentication authentication) {
         boolean isSuperAdmin = SecurityUtils.isSuperAdmin(authentication);
-        return ResponseEntity.ok(firefighterService.getPendingFirefightersFromMyStation(authentication.getName(), isSuperAdmin));
+        return ResponseEntity.ok(firefighterService.getFirefighters(authentication.getName(), false, isSuperAdmin));
     }
 
     @PatchMapping("/{id}/approve")

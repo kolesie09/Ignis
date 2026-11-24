@@ -12,12 +12,10 @@ public interface FirefighterRepository extends JpaRepository<Firefighter, Long> 
 
     Optional<Firefighter> findByUserLogin(String login);
 
-    List<Firefighter> findByFireStationId(Long fireStationId);
-
     boolean existsByFireStationIdAndUserNick(Long fireStationId, String nick);
 
-    List<Firefighter> findByFireStationIdAndUserActiveFalse(Long fireStationId);
+    List<Firefighter> findByFireStationIdAndUserActive(Long fireStationId, boolean active);
 
-    List<Firefighter> findByUserActiveFalse();
+    List<Firefighter> findByUserActive(boolean active);
 
 }

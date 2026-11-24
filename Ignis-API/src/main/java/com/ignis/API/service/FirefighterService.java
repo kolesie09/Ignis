@@ -109,37 +109,23 @@ public class FirefighterService {
         return mapToResponse(firefighter);
     }
 
-    // Metoda do pobierania strażaków przypisanych do jednostki OSP
-    public List<FirefighterResponse> getFirefightersFromMyStation(String login) {
-        Firefighter currentFirefighter = firefighterRepository.findByUserLogin(login)
-                .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + login));
+    public List<FirefighterResponse> getFirefighters(String login, boolean active, boolean isSuperAdmin) {
 
-        Long fireStationId = currentFirefighter.getFireStation().getId();
+        List<Firefighter> firefighters;
 
-        return firefighterRepository.findByFireStationId(fireStationId)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    public List<FirefighterResponse> getPendingFirefightersFromMyStation(String login, boolean isSuperAdmin) {
         if (isSuperAdmin) {
-            return firefighterRepository.findByUserActiveFalse()
-                    .stream()
-                    .map(this::mapToResponse)
-                    .toList();
+            firefighters = firefighterRepository.findByUserActive(active);
         } else {
             Firefighter currentFirefighter = firefighterRepository.findByUserLogin(login)
                     .orElseThrow(() -> new ResourceNotFoundException("Nie znaleziono strażaka dla użytkownika: " + login));
 
-            Long fireStationId = currentFirefighter.getFireStation().getId();
-
-            return firefighterRepository.findByFireStationIdAndUserActiveFalse(fireStationId)
-                    .stream()
-                    .map(this::mapToResponse)
-                    .toList();
-
+            firefighters = firefighterRepository.findByFireStationIdAndUserActive(
+                    currentFirefighter.getFireStation().getId(), active);
         }
+
+        return firefighters.stream()
+                .map(this::mapToResponse)
+                .toList();
 
     }
 
